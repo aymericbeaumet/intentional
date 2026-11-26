@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: instagram
+name: Instagram
+domains: [instagram.com]
+hosts: [www.instagram.com]
+
+intentional:
+  - label: Following (chronological)
+    url: https://www.instagram.com/?variant=following
+  - label: Favorites (chronological)
+    url: https://www.instagram.com/?variant=favorites
+
+policy:
+  allowed:
+    - A post or a reel opened by URL (/p/…, /reel/…), with its comments
+    - The Following and Favorites feeds, newest first
+    - Profiles, including their Reels tab, and stories from accounts you follow
+    - Search, hashtag and location pages
+    - Direct messages, notifications, your own profile and settings
+  blocked:
+    - The "For you" home feed (redirects to Following)
+    - Explore and Discover people (redirect to Following)
+    - The Reels feed (redirects to Following; a reel link from inside it opens that reel on its own page)
+    - The Popular page (redirects to Following)
+    - Suggested posts and reels mixed into feeds
+    - Suggested accounts in the sidebar, in feeds and on profiles
+    - The Explore and Reels buttons
+  limitations:
+    - The Following view lives at an undocumented URL (?variant=following); Instagram could retire it.
+    - Suggested posts are recognised by their English label ("Suggested for you", "Suggested reels"…). In other languages they stay in the feed.
+    - In the narrow (phone) layout, Instagram's search button is the Explore button, so it's hidden too. Search stays reachable at instagram.com/explore/search/.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), the home page and Explore stay reachable but their posts are hidden, and the Reels feed only plays the reel you opened. AdGuard may only re-check these URL-based rules when the page reloads, so reload after switching feeds in the app.
+
+redirects:
+  - from: '^/(?:\?(?!(?:.*&)?variant=(?:following|favorites)(?:&|$)).*)?$'
+    to: /?variant=following
+  - from: '^/explore(?:/(?:people/(?:suggested/)?)?)?(?:\?.*)?$'
+    to: /?variant=following
+  - from: '^/reels/?(?:\?.*)?$'
+    to: /?variant=following
+  - from: '^/reels/([A-Za-z0-9_-]+)/?(?:\?.*)?$'
+    to: /reel/$1/
+  - from: '^/popular/?(?:\?.*)?$'
+    to: /?variant=following

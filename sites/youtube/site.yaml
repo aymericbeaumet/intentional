@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: youtube
+name: YouTube
+domains: [youtube.com]
+hosts: [www.youtube.com, m.youtube.com]
+
+intentional:
+  - label: Subscriptions
+    url: https://www.youtube.com/feed/subscriptions
+
+policy:
+  allowed:
+    - Watching a video opened by URL, with its comments
+    - A Short opened by URL (plays in the regular player)
+    - Subscriptions feed, channels, playlists, Watch later, history
+    - Search results
+  blocked:
+    - Home feed (redirects to Subscriptions)
+    - Explore, Trending and Gaming (redirect to Subscriptions)
+    - Shorts player swiping, Shorts shelves, the Shorts tab and Shorts search filter
+    - Related videos next to and below the player
+    - End screens, end cards and the fullscreen "more videos" grid
+    - Recommendation shelves injected into search results
+  limitations:
+    - Autoplay can't be switched off by a filter list. Turn it off once with the player's toggle, and YouTube remembers it.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), the home page stays reachable but its feed is hidden.
+
+redirects:
+  - from: '^/(\?.*)?$'
+    to: /feed/subscriptions
+  - from: "^/shorts/([A-Za-z0-9_-]+)"
+    to: /watch?v=$1
+  - from: '^/feed/(explore|trending)\b'
+    to: /feed/subscriptions
+  - from: '^/gaming\b'
+    to: /feed/subscriptions

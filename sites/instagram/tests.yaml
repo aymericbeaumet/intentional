@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.instagram\.com/(\?.*)?$', file: home.html }
+  - { url: '^https://www\.instagram\.com/explore/(\?.*)?$', file: explore.html }
+  - { url: '^https://www\.instagram\.com/reels/', file: reels.html }
+  - { url: '^https://www\.instagram\.com/([\w.]+/)?(p|reel)/', file: post.html }
+  - { url: '^https://www\.instagram\.com/direct/', file: direct.html }
+  - { url: '^https://www\.instagram\.com/[\w.]+/(\?.*)?$', file: profile.html }
+
+redirects:
+  # Home: everything but the Following and Favorites feeds goes to Following.
+  - { url: 'https://www.instagram.com/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/?hl=en', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/?variant=home', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/?variant=followingx', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/?variant=following', expect: null }
+  - { url: 'https://www.instagram.com/?variant=favorites', expect: null }
+  - { url: 'https://www.instagram.com/?hl=en&variant=following', expect: null }
+  - { url: 'https://www.instagram.com/?variant=following&hl=en', expect: null }
+  # Explore and Discover people.
+  - { url: 'https://www.instagram.com/explore/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/explore', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/explore/?next=%2F', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/explore/people/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/explore/people/suggested/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/explore/search/', expect: null }
+  - { url: 'https://www.instagram.com/explore/search/keyword/?q=intentional', expect: null }
+  - { url: 'https://www.instagram.com/explore/tags/intentional/', expect: null }
+  - { url: 'https://www.instagram.com/explore/locations/123456789/paris-france/', expect: null }
+  # Reels: the feed goes to Following, a reel inside it opens on its own page.
+  - { url: 'https://www.instagram.com/reels/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/reels', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/reels/?s=tab', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/reels/DgF28H6PcXh/', expect: 'https://www.instagram.com/reel/DgF28H6PcXh/' }
+  - { url: 'https://www.instagram.com/reels/DgF28H6Pc-_/?igsh=abc', expect: 'https://www.instagram.com/reel/DgF28H6Pc-_/' }
+  - { url: 'https://www.instagram.com/reels/audio/27067218186209055/', expect: null }
+  - { url: 'https://www.instagram.com/reel/DgF28H6PcXh/', expect: null }
+  - { url: 'https://www.instagram.com/reel/DgF28H6PcXh/?utm_source=ig_web_copy_link', expect: null }
+  - { url: 'https://www.instagram.com/instagram/reel/DgF28H6PcXh/', expect: null }
+  - { url: 'https://www.instagram.com/instagram/reels/', expect: null }
+  # Popular (logged-out trending page).
+  - { url: 'https://www.instagram.com/popular/', expect: 'https://www.instagram.com/?variant=following' }
+  - { url: 'https://www.instagram.com/popular/supermoon/', expect: null }
+  # Allowed pages.
+  - { url: 'https://www.instagram.com/p/DgIxT9JG6no/', expect: null }
+  - { url: 'https://www.instagram.com/instagram/p/DgIxT9JG6no/', expect: null }
+  - { url: 'https://www.instagram.com/instagram/', expect: null }
+  - { url: 'https://www.instagram.com/stories/instagram/3500000000000000000/', expect: null }
+  - { url: 'https://www.instagram.com/direct/inbox/', expect: null }
+  - { url: 'https://www.instagram.com/direct/t/1234567890/', expect: null }
+  - { url: 'https://www.instagram.com/accounts/edit/', expect: null }
+
+pages:
+  - name: the Following feed keeps posts and stories, and drops suggestions and entry points
+    url: https://www.instagram.com/?variant=following
+    visible: ['#post-following', '#stories', '#nav-home', '#nav-search', '#nav-direct', '#nav-profile', '#sidebar-account']
+    hidden:
+      - '#nav-explore'
+      - '#nav-reels'
+      - '#post-suggested'
+      - '#post-suggested-reels'
+      - '#feed-suggested-accounts'
+      - '#sidebar-suggestions'
+  - name: the Favorites feed keeps its posts
+    url: https://www.instagram.com/?variant=favorites
+    visible: ['#post-following', '#stories']
+    hidden: ['#post-suggested', '#sidebar-suggestions']
+  - name: the For you feed is hidden, stories and navigation stay
+    url: https://www.instagram.com/
+    hidden: ['#post-following', '#post-suggested', '#nav-explore', '#nav-reels', '#sidebar-suggestions']
+    visible: ['#stories', '#nav-home', '#nav-direct', '#sidebar-account']
+  - name: home redirects to the Following feed
+    url: https://www.instagram.com/
+    expectUrl: https://www.instagram.com/?variant=following
+    visible: ['#post-following']
+  - name: the Explore grid is hidden, its search box stays
+    url: https://www.instagram.com/explore/
+    hidden: ['#tile-post', '#tile-reel', '#nav-explore']
+    visible: ['#explore-search', '#nav-home']
+  - name: Explore redirects to the Following feed
+    url: https://www.instagram.com/explore/
+    expectUrl: https://www.instagram.com/?variant=following
+    visible: ['#post-following']
+  - name: the Reels feed only plays the reel that was opened
+    url: https://www.instagram.com/reels/DgF28H6PcXh/
+    visible: ['#reel-1', '#reel-1-video']
+    hidden: ['#reels-nav', '#reel-2', '#reel-3', '#nav-reels']
+  - name: a reel from the Reels feed opens on its own page
+    url: https://www.instagram.com/reels/DgF28H6PcXh/
+    expectUrl: https://www.instagram.com/reel/DgF28H6PcXh/
+    visible: ['#post-video', '#post-comments']
+  - name: the Reels feed redirects to the Following feed
+    url: https://www.instagram.com/reels/
+    expectUrl: https://www.instagram.com/?variant=following
+  - name: a reel opened by URL plays with its comments
+    url: https://www.instagram.com/reel/DgF28H6PcXh/
+    visible: ['#post-video', '#post-author', '#post-comments', '#more-from-creator', '#nav-home']
+    hidden: ['#nav-explore', '#nav-reels']
+  - name: a post opened by URL shows with its comments
+    url: https://www.instagram.com/p/DgIxT9JG6no/
+    visible: ['#post-media', '#post-author', '#post-comments']
+  - name: profiles keep their posts and Reels tab, and drop suggested accounts
+    url: https://www.instagram.com/someone/
+    visible: ['#profile-header', '#tab-posts', '#tab-reels', '#tab-tagged', '#profile-grid']
+    hidden: ['#profile-suggestions', '#nav-explore', '#nav-reels']
+  - name: direct messages stay
+    url: https://www.instagram.com/direct/inbox/
+    visible: ['#inbox', '#nav-direct']
+  - name: in-app navigation to home lands on the Following feed
+    url: https://www.instagram.com/p/DgIxT9JG6no/
+    steps: [{ navigate: / }]
+    expectUrl: https://www.instagram.com/?variant=following
+    visible: ['#post-following']
+  - name: in-app navigation to Explore lands on the Following feed
+    url: https://www.instagram.com/direct/inbox/
+    steps: [{ navigate: /explore/ }]
+    expectUrl: https://www.instagram.com/?variant=following
+  - name: scrolling the Reels feed to another reel opens it on its own page
+    url: https://www.instagram.com/?variant=following
+    steps: [{ navigate: /reels/ZZZZZZZZZZZ/ }]
+    expectUrl: https://www.instagram.com/reel/ZZZZZZZZZZZ/
+
+live:
+  - name: profile suggested accounts
+    url: https://www.instagram.com/instagram/
+    exists: ['main[role="main"]', 'a[href$="/related_profiles/"]', 'div:has(> div > a[href$="/related_profiles/"])']
+    hidden: ['div:has(> div > a[href$="/related_profiles/"])']
+  - name: Reels feed structure our rules rely on
+    url: https://www.instagram.com/reels/DgF28H6PcXh/
+    exists: ['main > div[role="toolbar"]', 'main:has(> div[role="toolbar"]) > div:first-child > div:nth-child(2) video']
+    expectUrl: https://www.instagram.com/reel/DgF28H6PcXh/
+  - name: home redirects to the Following feed
+    url: https://www.instagram.com/
+    expectUrl: https://www.instagram.com/?variant=following

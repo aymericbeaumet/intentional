@@ -1,0 +1,37 @@
+! LinkedIn: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Home feed: the feed root (/feed/, with or without a query) ---
+! Redirects send it to Notifications; this is the fallback without redirects. Single posts
+! (/feed/update/…) are another path. Links that highlight a post keep the feed so the post shows.
+www.linkedin.com##:matches-path(/^\/feed\/?(?:\?(?!(?:.*&)?highlightedUpdateUrns=urn(?::|%3[Aa])li(?::|%3[Aa])[A-Za-z]+(?::|%3[Aa])[0-9]+(?:&|,|%2[Cc]|$)).*)?$/) :is(main, aside)
+
+! --- Feed: no further pages load ---
+! Lowercase on purpose: patterns match case-insensitively, and uBO reports them lowercased.
+||www.linkedin.com/flagship-web/rsc-action/actions/pagination?*sduiid=com.linkedin.sdui.pagers.feed.mainfeed$xhr,1p
+
+! --- Home nav item: it only leads to the feed ---
+! New top bar (Home is a button), then the older one still used on some pages.
+www.linkedin.com##[data-testid="primary-nav"] li:has(button[aria-label^="Home"])
+www.linkedin.com##li.global-nav__primary-item:has(a[href*="/feed/"])
+
+! --- Side rails: LinkedIn News and "Add to your feed" ---
+! Older layout hooks.
+www.linkedin.com###feed-news-module
+www.linkedin.com##[data-view-name="feed-news-module"]
+www.linkedin.com##.feed-follows-module
+! New layout: no stable hook. From the module's heading (a <p> there), up to the closest
+! module of the rail (never past the rail itself).
+www.linkedin.com##aside p:has-text(/^\s*(LinkedIn News|Add to your feed)\s*$/):upward(aside [componentkey])
+
+! --- Side rails: "People you may know" next to profiles ---
+www.linkedin.com##aside :is(h2, h3):has-text(/^\s*(People you may know|More profiles for you)/):upward(aside section)
+
+! --- My Network: "People you may know" and other suggestion cards ---
+! The page stays (invitations and your network are yours); its suggestion cards are found by
+! their "Invite … to connect" and "Follow …" buttons.
+www.linkedin.com##:matches-path(/^\/mynetwork\/(grow\/?)?(\?.*)?$/) button[aria-label^="Invite "][aria-label$=" to connect"]:upward(:is(li, [role="listitem"]))
+www.linkedin.com##:matches-path(/^\/mynetwork\/(grow\/?)?(\?.*)?$/) button[aria-label^="Follow "]:upward(:is(li, [role="listitem"]))
+
+! --- Promoted: ads in the side rails ---
+www.linkedin.com##aside div:has(> iframe[title="advertisement"])
+www.linkedin.com##section:has(> iframe[data-ad-banner])

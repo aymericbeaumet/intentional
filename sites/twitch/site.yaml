@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: twitch
+name: Twitch
+domains: [twitch.tv]
+hosts: [www.twitch.tv, m.twitch.tv]
+
+intentional:
+  - label: Following
+    url: https://www.twitch.tv/directory/following
+
+policy:
+  allowed:
+    - A channel opened by URL, live or offline, with its chat
+    - Videos (VODs) and clips opened by URL
+    - The Following page and the Followed Channels list of the side navigation
+    - Search, and a specific category or tag opened by URL
+    - Your own profile, inventory, subscriptions, settings and whispers
+  blocked:
+    - The front page and its featured carousel (redirects to Following)
+    - Browse, its Live Channels tab and the vertical hubs (Gaming, IRL, Music, Creative, Esports) (redirect to Following)
+    - Recommended Channels, recommended collabs, popular channels, recommended categories and "Viewers Also Watch" in the side navigation
+    - The "Recommended channels" shelf of the Following page
+    - The Browse entry of the top navigation and the Live tab and Browse entry of the mobile site
+  limitations:
+    - Raids and hosts send you to another channel at the end of a stream. They are decided by the streamer and can't be filtered; leave the raid from the player if you don't want to follow it.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), the front page stays reachable but its feed is hidden, and Browse stays reachable from its URL (its entry point is hidden).
+    - The side navigation sections and the Following page shelf were checked against Twitch's own code and the logged-out site; their logged-in look couldn't be verified first-hand.
+
+redirects:
+  - from: '^/(\?.*)?$'
+    to: /directory/following
+  - from: '^/directory/?(\?.*)?$'
+    to: /directory/following
+  - from: '^/directory/(all|gaming|irl|music|creative|esports)/?(\?.*)?$'
+    to: /directory/following

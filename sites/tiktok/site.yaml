@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: tiktok
+name: TikTok
+domains: [tiktok.com]
+hosts: [www.tiktok.com]
+
+intentional:
+  - label: Following
+    url: https://www.tiktok.com/following
+  - label: Following LIVE
+    url: https://www.tiktok.com/live/following
+
+policy:
+  allowed:
+    - A single video or photo post opened by URL (vm.tiktok.com and vt.tiktok.com short links lead there), with its comments
+    - Profiles and their videos
+    - The Following feed and the LIVE streams of accounts you follow
+    - Search, hashtag and sound pages
+    - A LIVE stream opened by URL, messages, notifications, your own profile
+  blocked:
+    - The For You feed (redirects to Following)
+    - Explore (redirects to Following)
+    - The For You LIVE feed (redirects to Following LIVE)
+    - The Short dramas hub (redirects to Following)
+    - The videos queued after a video opened by URL, its previous/next buttons and its "You may like" tab
+    - Suggested accounts on profiles and on the Following page
+    - The For You, Explore, LIVE and Short dramas entries of the side navigation
+  limitations:
+    - The Following feed is itself a swipe feed. It only holds accounts you follow, but scrolling plays the next one.
+    - The "You may like" tab under a video is matched by its English label. In other languages the tab stays, but the recommendations that fill it are blocked.
+    - The suggested accounts panel that opens on a profile after you follow someone is matched by its English "View all" label; its toggle button is hidden in every language.
+    - The "Suggested LIVE creators" column of LIVE pages stays visible, because it can't be told apart from the creators you follow without relying on its English title.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), For You, Explore and the LIVE hub stay reachable but their feeds are hidden.
+
+redirects:
+  - from: '^/(foryou/?)?(\?.*)?$'
+    to: /following
+  - from: '^/explore/?(\?.*)?$'
+    to: /following
+  - from: '^/live/?(\?.*)?$'
+    to: /live/following
+  - from: '^/shortdrama/?(\?.*)?$'
+    to: /following

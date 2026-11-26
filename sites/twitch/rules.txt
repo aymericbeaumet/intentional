@@ -1,0 +1,25 @@
+! Twitch: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Front page: featured carousel and recommendation shelves (redirects to Following) ---
+www.twitch.tv##[data-a-target="front-page-carousel"]
+www.twitch.tv##[data-a-target="front-page-main-content"]
+
+! --- Browse: entry point (Browse redirects to Following) ---
+www.twitch.tv##a[data-a-target="browse-link"]
+
+! --- Side navigation: recommendation sections; Followed Channels stays ---
+! Each section is a `.side-nav-section`; its cards say where they come from in data-test-selector.
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="recommended-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="recommended-collab-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="popular-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="similarity-channel"])
+www.twitch.tv##.side-nav-section:has([data-test-selector="category"])
+
+! --- Following page: the "Recommended channels" shelf ---
+! Recommendation shelves render as `.find-me` with shelf cards; followed live channels use other cards.
+www.twitch.tv##.find-me:has([data-test-selector="shelf-card-selector"])
+
+! --- Mobile site: the Live tab, the Browse entry and the front page feed ---
+m.twitch.tv##li[role="presentation"]:has(> a[role="tab"][href="/"])
+m.twitch.tv##a[href="/directory"]
+m.twitch.tv##:matches-path(/^\/(\?|$)/) #page-main-content-wrapper

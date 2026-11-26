@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Bluesky</title></head>
+<body>
+<div id="root">
+  <nav id="left-nav">
+    <a href="/" role="link" aria-label="Home" id="nav-home">Home</a>
+    <a href="/search" role="link" aria-label="Explore" id="nav-search">Explore</a>
+    <a href="/notifications" role="link" aria-label="Notifications" id="nav-notifications">Notifications</a>
+  </nav>
+  <div data-testid="HomeScreen">
+    <div data-testid="homeScreen">
+      <div></div>
+      <div>
+        <div data-testid="homeScreenFeedTabs" role="tablist">
+          <div data-testid="homeScreenFeedTabs-selector">
+            <div role="tab" tabindex="0" data-testid="homeScreenFeedTabs-selector-0" id="tab-discover"><div><div><div data-testid="homeScreenFeedTabs-Discover">Discover</div></div></div></div>
+            <div role="tab" tabindex="0" data-testid="homeScreenFeedTabs-selector-1" id="tab-following"><div><div><div data-testid="homeScreenFeedTabs-Following">Following</div></div></div></div>
+            <div role="tab" tabindex="0" data-testid="homeScreenFeedTabs-selector-2" id="tab-list"><div><div><div data-testid="homeScreenFeedTabs-Good people">Good people</div></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex: 1 1 0%;"><div data-testid="customFeedPage" data-nosnippet="" id="discover-feed"><a href="/profile/someone.test/post/3aaaaaaaaaaaa">Recommended post</a></div></div>
+      <div style="display: none;"><div data-testid="followingFeedPage" id="following-feed"><a href="/profile/friend.test/post/3bbbbbbbbbbbb" id="following-post">Post from someone you follow</a></div></div>
+      <div style="display: none;"><div data-testid="customFeedPage" id="list-feed"><a href="/profile/friend.test/post/3cccccccccccc" id="list-post">Post from your list</a></div></div>
+    </div>
+  </div>
+  <div id="right-nav">
+    <div id="desktop-feeds">
+      <div role="link" tabindex="0" aria-label="Discover" id="sidebar-discover">Discover</div>
+      <div role="link" tabindex="0" aria-label="Following" id="sidebar-following">Following</div>
+      <a href="/feeds" role="link" aria-label="More feeds" id="sidebar-more-feeds">More feeds</a>
+    </div>
+    <div id="trending">
+      <div><div>Trending</div><button role="button" aria-label="Trending options">...</button></div>
+      <div>
+        <a href="/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/aaaaaaaaaaaa" role="link">1. A topic</a>
+        <a href="/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/bbbbbbbbbbbb" role="link">2. Another topic</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Simulates Bluesky's pager: one page per pinned feed, `?feed=` picks one at boot.
+  (() => {
+    const feeds = ["feedgen|at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot", "following", "list|at://did:plc:friend/app.bsky.graph.list/good"];
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const pages = [...document.querySelectorAll('[data-testid="homeScreen"] > div:nth-child(n+3)')];
+    const select = (index) => pages.forEach((page, i) => page.setAttribute("style", i === index ? "flex: 1 1 0%;" : "display: none;"));
+    tabs.forEach((tab, i) => tab.addEventListener("click", () => select(i)));
+    const boot = feeds.indexOf(new URLSearchParams(location.search).get("feed") ?? "");
+    if (boot >= 0) select(boot);
+  })();
+</script>
+</body></html>

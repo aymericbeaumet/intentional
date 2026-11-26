@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.twitch\.tv/(\?.*)?$', file: home.html }
+  - { url: '^https://www\.twitch\.tv/directory/following', file: following.html }
+  - { url: '^https://www\.twitch\.tv/directory/category/', file: category.html }
+  - { url: '^https://www\.twitch\.tv/directory/?((all|gaming|irl|music|creative|esports)/?)?(\?.*)?$', file: browse.html }
+  - { url: '^https://www\.twitch\.tv/videos/', file: channel.html }
+  - { url: '^https://www\.twitch\.tv/[a-z0-9_]+/?(\?.*)?$', file: channel.html }
+  - { url: '^https://m\.twitch\.tv/(\?.*)?$', file: m-home.html }
+  - { url: '^https://m\.twitch\.tv/directory/following', file: m-following.html }
+
+redirects:
+  - { url: 'https://www.twitch.tv/', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/?no-reload=true', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://m.twitch.tv/', expect: 'https://m.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory?sort=VIEWER_COUNT', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://m.twitch.tv/directory', expect: 'https://m.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/all', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/gaming', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/irl', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/esports?sort=x', expect: 'https://www.twitch.tv/directory/following' }
+  - { url: 'https://www.twitch.tv/directory/following', expect: null }
+  - { url: 'https://www.twitch.tv/directory/following/live', expect: null }
+  - { url: 'https://www.twitch.tv/directory/following/videos', expect: null }
+  - { url: 'https://www.twitch.tv/directory/following/channels', expect: null }
+  - { url: 'https://www.twitch.tv/directory/category/just-chatting', expect: null }
+  - { url: 'https://www.twitch.tv/directory/all/tags/English', expect: null }
+  - { url: 'https://www.twitch.tv/twitch', expect: null }
+  - { url: 'https://www.twitch.tv/twitch/videos', expect: null }
+  - { url: 'https://www.twitch.tv/videos/1111111111', expect: null }
+  - { url: 'https://www.twitch.tv/twitch/clip/SomeClipSlug', expect: null }
+  - { url: 'https://www.twitch.tv/search?term=directory', expect: null }
+  - { url: 'https://www.twitch.tv/directoryfan', expect: null }
+  - { url: 'https://m.twitch.tv/directory/following', expect: null }
+  - { url: 'https://m.twitch.tv/twitch/home', expect: null }
+
+pages:
+  - name: front page carousel, shelves and recommendation sections are hidden
+    url: https://www.twitch.tv/
+    hidden: ['#carousel', '#front-page-main-content', '#browse-link', '#recommended-section']
+    visible: ['#home-link', '#following-link', '#search', '#followed-section']
+  - name: front page redirects to Following
+    url: https://www.twitch.tv/
+    expectUrl: https://www.twitch.tv/directory/following
+    visible: ['#followed-live-card']
+  - name: Browse redirects to Following
+    url: https://www.twitch.tv/directory
+    expectUrl: https://www.twitch.tv/directory/following
+  - name: the Live Channels tab of Browse redirects to Following
+    url: https://www.twitch.tv/directory/all
+    expectUrl: https://www.twitch.tv/directory/following
+  - name: without redirects Browse stays reachable, its entry point and recommendations are hidden
+    url: https://www.twitch.tv/directory
+    hidden: ['#browse-link', '#recommended-section']
+    visible: ['#following-link', '#followed-section']
+  - name: Following keeps followed channels and drops the recommended shelf
+    url: https://www.twitch.tv/directory/following
+    visible: ['#tab-overview', '#live-following', '#followed-live-card', '#latest-videos', '#followed-section', '#following-link']
+    hidden: ['#recommended-shelf', '#recommended-section', '#browse-link']
+  - name: a channel keeps its player and chat, and the side navigation keeps only followed channels
+    url: https://www.twitch.tv/somechannel
+    visible: ['#player', '#chat', '#follow-button', '#tab-videos', '#followed-section']
+    hidden:
+      - '#live-section'
+      - '#collab-section'
+      - '#popular-section'
+      - '#categories-section'
+      - '#similar-section'
+  - name: a video opened by URL plays
+    url: https://www.twitch.tv/videos/1111111111
+    visible: ['#player', '#followed-section']
+    hidden: ['#similar-section']
+  - name: a category opened by URL stays
+    url: https://www.twitch.tv/directory/category/just-chatting
+    visible: ['#category-title', '#category-stream', '#search']
+  - name: in-app navigation to the front page lands on Following
+    url: https://www.twitch.tv/somechannel
+    steps: [{ navigate: / }]
+    expectUrl: https://www.twitch.tv/directory/following
+  - name: in-app navigation to Browse lands on Following
+    url: https://www.twitch.tv/directory/category/just-chatting
+    steps: [{ navigate: /directory }]
+    expectUrl: https://www.twitch.tv/directory/following
+  - name: mobile front page feed, Live tab and Browse are hidden
+    url: https://m.twitch.tv/
+    hidden: ['#page-main-content-wrapper', '#m-tab-live', '#m-nav-browse']
+    visible: ['#m-tab-following', '#m-nav-home', '#m-nav-activity', '#m-nav-profile']
+  - name: mobile front page redirects to Following
+    url: https://m.twitch.tv/
+    expectUrl: https://m.twitch.tv/directory/following
+    visible: ['#m-followed-card']
+  - name: mobile Following keeps followed channels
+    url: https://m.twitch.tv/directory/following
+    visible: ['#page-main-content-wrapper', '#m-followed-card', '#m-tab-following']
+    hidden: ['#m-tab-live', '#m-nav-browse']
+
+live:
+  - name: side navigation structure our rules rely on
+    url: https://www.twitch.tv/twitch
+    exists:
+      - '.side-nav-section[role="group"]'
+      - '.side-nav-section a[data-test-selector="recommended-channel"]'
+      - '.side-nav-section a[data-test-selector="similarity-channel"]'
+      - 'a[data-a-target="browse-link"]'
+  - name: front page hooks
+    url: https://www.twitch.tv/
+    exists: ['[data-a-target="front-page-carousel"]', '[data-a-target="front-page-main-content"]']
+  - name: front page redirects to Following
+    url: https://www.twitch.tv/
+    expectUrl: https://www.twitch.tv/directory/following

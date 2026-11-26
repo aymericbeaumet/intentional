@@ -1,0 +1,33 @@
+name: canary
+
+# Nightly check against the live sites: does the markup our rules rely on still
+# exist, and do the lists still work there? Failures open one issue per site.
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: jdx/mise-action@v3
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
+      - uses: ./.github/actions/browsers
+      - name: Run the live canary
+        id: canary
+        run: npx vitest run --project live --reporter=default --reporter=json --outputFile=live-results.json
+      - name: Open, update or close breakage issues
+        if: ${{ !cancelled() && steps.canary.outcome != 'skipped' && hashFiles('live-results.json') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node tests/live/report.ts live-results.json

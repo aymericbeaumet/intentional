@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.youtube\.com/(\?.*)?$', file: home.html }
+  - { url: '^https://www\.youtube\.com/feed/subscriptions', file: subscriptions.html }
+  - { url: '^https://www\.youtube\.com/feed/(trending|explore)', file: trending.html }
+  - { url: '^https://www\.youtube\.com/watch', file: watch.html }
+  - { url: '^https://www\.youtube\.com/shorts/', file: shorts.html }
+  - { url: '^https://www\.youtube\.com/results', file: search.html }
+  - { url: '^https://www\.youtube\.com/@', file: channel.html }
+  - { url: '^https://m\.youtube\.com/(\?.*)?$', file: m-home.html }
+  - { url: '^https://m\.youtube\.com/feed/subscriptions', file: m-subscriptions.html }
+  - { url: '^https://m\.youtube\.com/watch', file: m-watch.html }
+
+network:
+  - url: https://www.youtube.com/youtubei/v1/reel/reel_watch_sequence?prettyPrint=false
+    from: https://www.youtube.com/shorts/BBBBBBBBBBB
+    type: fetch
+    expect: block
+    why: the queue of next Shorts
+  - url: https://www.youtube.com/youtubei/v1/reel/reel_item_watch?prettyPrint=false
+    from: https://www.youtube.com/shorts/BBBBBBBBBBB
+    type: fetch
+    expect: allow
+    why: the Short that was opened
+  - url: https://www.youtube.com/youtubei/v1/player?prettyPrint=false
+    from: https://www.youtube.com/watch?v=AAAAAAAAAAA
+    type: fetch
+    expect: allow
+  - url: https://www.youtube.com/youtubei/v1/browse?prettyPrint=false
+    from: https://www.youtube.com/feed/subscriptions
+    type: fetch
+    expect: allow
+  - url: https://www.youtube.com/watch?v=AAAAAAAAAAA
+    type: document
+    expect: allow
+  - url: https://www.youtube.com/shorts/BBBBBBBBBBB
+    type: document
+    expect: allow
+    why: a Short opened by URL is allowed (redirects then show it in the regular player)
+
+redirects:
+  - { url: "https://www.youtube.com/", expect: "https://www.youtube.com/feed/subscriptions" }
+  - { url: "https://www.youtube.com/?app=desktop", expect: "https://www.youtube.com/feed/subscriptions" }
+  - { url: "https://m.youtube.com/", expect: "https://m.youtube.com/feed/subscriptions" }
+  - {
+      url: "https://www.youtube.com/shorts/BBBBBBBBBBB",
+      expect: "https://www.youtube.com/watch?v=BBBBBBBBBBB",
+    }
+  - {
+      url: "https://www.youtube.com/shorts/BBBBBBBBBBB?feature=share",
+      expect: "https://www.youtube.com/watch?v=BBBBBBBBBBB",
+    }
+  - { url: "https://www.youtube.com/feed/explore", expect: "https://www.youtube.com/feed/subscriptions" }
+  - {
+      url: "https://www.youtube.com/feed/trending?bp=x",
+      expect: "https://www.youtube.com/feed/subscriptions",
+    }
+  - { url: "https://www.youtube.com/gaming", expect: "https://www.youtube.com/feed/subscriptions" }
+  - { url: "https://www.youtube.com/feed/subscriptions", expect: null }
+  - { url: "https://www.youtube.com/feed/history", expect: null }
+  - { url: "https://www.youtube.com/watch?v=AAAAAAAAAAA", expect: null }
+  - { url: "https://www.youtube.com/@channel", expect: null }
+  - { url: "https://www.youtube.com/@channel/shorts", expect: null }
+  - { url: "https://www.youtube.com/results?search_query=shorts", expect: null }
+  - { url: "https://www.youtube.com/playlist?list=WL", expect: null }
+  - { url: "https://www.youtube.com/feed/explorer", expect: null }
+
+pages:
+  - name: home feed and its entry points are hidden
+    url: https://www.youtube.com/
+    hidden: ["#browse-home", "#guide-home", "#mini-home", "#guide-shorts", "#mini-shorts"]
+    visible: ["#logo", "#guide-subscriptions", "#mini-subscriptions"]
+  - name: home redirects to subscriptions
+    url: https://www.youtube.com/
+    expectUrl: https://www.youtube.com/feed/subscriptions
+    visible: ["#sub-video"]
+  - name: subscriptions keep videos and drop Shorts
+    url: https://www.youtube.com/feed/subscriptions
+    visible: ["#browse-subscriptions", "#sub-video"]
+    hidden: ["#sub-shorts-section", "#sub-short-item", "#sub-shorts-grid", "#sub-short-lockup"]
+  - name: watch page keeps the video and comments, drops what comes next
+    url: https://www.youtube.com/watch?v=AAAAAAAAAAA
+    visible: ["#video", "#metadata", "#comments", "#autoplay-toggle"]
+    hidden: ["#related", "#related-results", "#end-card", "#videowall", "#endscreen", "#fullscreen-grid"]
+  - name: a Short opened by URL plays without previous/next
+    url: https://www.youtube.com/shorts/BBBBBBBBBBB
+    visible: ["#short-video"]
+    hidden: ["#navigation-button-up", "#navigation-button-down"]
+  - name: a Short opened by URL plays in the regular player
+    url: https://www.youtube.com/shorts/BBBBBBBBBBB?feature=share
+    expectUrl: https://www.youtube.com/watch?v=BBBBBBBBBBB
+    visible: ["#video"]
+    hidden: ["#related"]
+  - name: search keeps results and drops Shorts and recommendation shelves
+    url: https://www.youtube.com/results?search_query=intentional
+    visible: ["#result-video", "#chip-all", "#chip-videos"]
+    hidden:
+      - "#chip-shorts"
+      - "#result-short"
+      - "#result-reel-shelf"
+      - "#result-people-also-watched"
+      - "#result-searches"
+      - "#result-grid-short"
+  - name: channel pages hide the Shorts tab
+    url: https://www.youtube.com/@channel
+    visible: ["#tab-videos", "#tab-playlists"]
+    hidden: ["#tab-shorts"]
+  - name: trending is hidden
+    url: https://www.youtube.com/feed/trending
+    hidden: ["#browse-trending"]
+  - name: explore redirects to subscriptions
+    url: https://www.youtube.com/feed/explore
+    expectUrl: https://www.youtube.com/feed/subscriptions
+  - name: in-app navigation to home lands on subscriptions
+    url: https://www.youtube.com/watch?v=AAAAAAAAAAA
+    steps: [{ navigate: / }]
+    expectUrl: https://www.youtube.com/feed/subscriptions
+  - name: in-app navigation to a Short opens the regular player
+    url: https://www.youtube.com/feed/subscriptions
+    steps: [{ navigate: /shorts/ZZZZZZZZZZZ }]
+    expectUrl: https://www.youtube.com/watch?v=ZZZZZZZZZZZ
+  - name: mobile home feed and tabs are hidden
+    url: https://m.youtube.com/
+    hidden: ["#m-home-feed", "#m-pivot-home", "#m-pivot-shorts"]
+    visible: ["#m-pivot-subs"]
+  - name: mobile home redirects to subscriptions
+    url: https://m.youtube.com/
+    expectUrl: https://m.youtube.com/feed/subscriptions
+  - name: mobile subscriptions keep videos and drop Shorts
+    url: https://m.youtube.com/feed/subscriptions
+    visible: ["#m-sub-video"]
+    hidden: ["#m-sub-short", "#m-sub-reel-shelf", "#m-sub-lockup", "#m-sub-lockup-v2", "#m-sub-rich-short"]
+  - name: mobile watch page drops related videos and end screens
+    url: https://m.youtube.com/watch?v=AAAAAAAAAAA
+    visible: ["#m-player", "#m-metadata", "#m-comments"]
+    hidden: ["#m-related", "#m-endscreen", "#m-end-card"]
+
+live:
+  # SOCS=CAI declines YouTube's EU consent wall, which otherwise redirects logged-out visits.
+  - name: watch page structure our rules rely on
+    url: https://www.youtube.com/watch?v=jNQXAC9IVRw
+    cookies: [{ name: SOCS, value: CAI, domain: .youtube.com }]
+    exists: ["ytd-watch-flexy", "#related", "#movie_player", "ytd-comments"]
+    hidden: ["#related"]
+  - name: home page browse element
+    url: https://www.youtube.com/
+    cookies: [{ name: SOCS, value: CAI, domain: .youtube.com }]
+    exists: ['ytd-browse[page-subtype="home"]']
+  - name: home redirects to subscriptions
+    url: https://www.youtube.com/
+    cookies: [{ name: SOCS, value: CAI, domain: .youtube.com }]
+    expectUrl: https://www.youtube.com/feed/subscriptions
+  - name: a Short opens in the regular player
+    url: https://www.youtube.com/shorts/jNQXAC9IVRw
+    cookies: [{ name: SOCS, value: CAI, domain: .youtube.com }]
+    expectUrl: https://www.youtube.com/watch?v=jNQXAC9IVRw

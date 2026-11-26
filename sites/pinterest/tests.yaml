@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.pinterest\.com/(homefeed/?)?(\?.*)?$', file: home.html }
+  - { url: '^https://www\.pinterest\.com/following/', file: following.html }
+  - { url: '^https://www\.pinterest\.com/pin/', file: pin.html }
+  - { url: '^https://fr\.pinterest\.com/pin/', file: pin-classic.html }
+  - { url: '^https://(www|fr)\.pinterest\.com/(ideas|today)/?(\?.*)?$', file: ideas.html }
+  - { url: '^https://www\.pinterest\.com/', file: board.html }
+
+redirects:
+  - { url: 'https://www.pinterest.com/ideas/', expect: 'https://www.pinterest.com/following/' }
+  - { url: 'https://www.pinterest.com/ideas', expect: 'https://www.pinterest.com/following/' }
+  - { url: 'https://www.pinterest.com/ideas/?lang=fr', expect: 'https://www.pinterest.com/following/' }
+  - { url: 'https://fr.pinterest.com/ideas/', expect: 'https://fr.pinterest.com/following/' }
+  - { url: 'https://www.pinterest.com/today/', expect: 'https://www.pinterest.com/following/' }
+  - { url: 'https://uk.pinterest.com/today', expect: 'https://uk.pinterest.com/following/' }
+  - { url: 'https://www.pinterest.com/', expect: null }
+  - { url: 'https://www.pinterest.com/homefeed/', expect: null }
+  - { url: 'https://www.pinterest.com/following/', expect: null }
+  - { url: 'https://www.pinterest.com/pin/1111111111111111111/', expect: null }
+  - { url: 'https://www.pinterest.com/ideas/animals/925056443165/', expect: null }
+  - { url: 'https://www.pinterest.com/today/best/some-article/123456/', expect: null }
+  - { url: 'https://www.pinterest.com/search/pins/?q=ideas', expect: null }
+  - { url: 'https://www.pinterest.com/someone/', expect: null }
+  - { url: 'https://www.pinterest.com/someone/ideas/', expect: null }
+  - { url: 'https://www.pinterest.com/ideasforyou/', expect: null }
+
+pages:
+  - name: the home feed and the Explore entry are hidden
+    url: https://www.pinterest.com/
+    hidden: ['#home-grid', '#today-tab']
+    visible: ['#home-tab', '#boards-tab', '#create-tab', '#updates-tab', '#messages-tab', '#search']
+  - name: the /homefeed/ alias of the home feed is hidden too
+    url: https://www.pinterest.com/homefeed/
+    hidden: ['#home-grid']
+    visible: ['#home-tab', '#search']
+  - name: Following keeps its pins
+    url: https://www.pinterest.com/following/
+    visible: ['#following-grid', '#followed-pin', '#home-tab', '#boards-tab']
+    hidden: ['#today-tab']
+  - name: a pin opened by URL keeps the pin and its comments, drops More to explore
+    url: https://www.pinterest.com/pin/1111111111111111111/
+    visible: ['#pin-grid', '#main-item', '#closeup', '#pin-image', '#pin-title', '#creator', '#original-board', '#comments', '#comment-1']
+    hidden: ['#related-item-1', '#related-item-2', '#related-interests', '#more-like-this']
+  - name: a pin on a country subdomain, related pins under the closeup, is cleaned too
+    url: https://fr.pinterest.com/pin/1111111111111111111/
+    visible: ['#closeup', '#pin-image', '#pin-title', '#comments']
+    hidden: ['#related-title', '#related-item-1']
+  - name: Explore is hidden
+    url: https://www.pinterest.com/ideas/
+    hidden: ['#ideas-header', '#ideas-today', '#ideas-board', '#ideas-grid', '#ideas-tab', '#shopping-tab']
+    visible: ['#logo', '#search', '#login']
+  - name: Explore redirects to Following
+    url: https://www.pinterest.com/ideas/
+    expectUrl: https://www.pinterest.com/following/
+    visible: ['#followed-pin']
+  - name: Today redirects to Following
+    url: https://www.pinterest.com/today/
+    expectUrl: https://www.pinterest.com/following/
+  - name: Explore on a country subdomain redirects to its Following
+    url: https://fr.pinterest.com/ideas/
+    expectUrl: https://fr.pinterest.com/following/
+  - name: a topic page opened by URL keeps its pins
+    url: https://www.pinterest.com/ideas/animals/925056443165/
+    visible: ['#page-grid', '#page-pin', '#search']
+    hidden: ['#today-tab']
+  - name: boards keep their pins
+    url: https://www.pinterest.com/someone/some-board/
+    visible: ['#page-title', '#page-grid', '#page-pin', '#home-tab']
+  - name: search keeps its results
+    url: https://www.pinterest.com/search/pins/?q=cats
+    visible: ['#page-grid', '#page-pin', '#search']
+  - name: in-app navigation to Explore lands on Following
+    url: https://www.pinterest.com/pin/1111111111111111111/
+    steps: [{ navigate: /ideas/ }]
+    expectUrl: https://www.pinterest.com/following/
+
+live:
+  - name: pin page structure our rules rely on
+    url: https://www.pinterest.com/pin/99360735500167749/
+    exists:
+      - '[data-test-id="relatedPins"]'
+      - '[data-test-id="CloseupMainPin"]'
+      - '[data-test-id="relatedPins"] [data-grid-item]'
+      - '[data-test-id="pin-metadata-drawer-related-interests-section"]'
+  - name: Explore page structure our rules rely on
+    url: https://www.pinterest.com/ideas/
+    exists: ['[data-test-id="ideas-tab"]', '[data-test-id^="ideas-root-"]', '[data-test-id="grid"]']

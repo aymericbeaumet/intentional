@@ -1,0 +1,139 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+
+  version:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - id: next
+        name: Next version from Conventional Commits
+        run: |
+          last=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)
+          if [ -n "$last" ] && [ "$(git rev-list -n 1 "$last")" = "$GITHUB_SHA" ]; then
+            echo "version=${last#v}" >>"$GITHUB_OUTPUT"
+            exit 0
+          elif [ -z "$last" ]; then
+            base=$(node -p "require('./package.json').version"); range=HEAD
+          else
+            base=${last#v}; range="$last..HEAD"
+          fi
+          IFS=. read -r major minor patch <<<"$base"
+          log=$(git log --format='%s%n%b' "$range")
+          if grep -qE '^[a-z]+(\([^)]*\))?!:|^BREAKING[ -]CHANGE: ' <<<"$log"; then
+            major=$((major + 1)); minor=0; patch=0
+          elif grep -qE '^feat(\([^)]*\))?:' <<<"$log"; then
+            minor=$((minor + 1)); patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          echo "version=$major.$minor.$patch" >>"$GITHUB_OUTPUT"
+
+  build:
+    needs: [test, version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: jdx/mise-action@v3
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
+      - name: Build lists and website
+        env:
+          INTENTIONAL_VERSION: ${{ needs.version.outputs.version }}
+        run: npm run build && npm run site
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Collect release assets
+        run: |
+          mkdir release
+          for target in ublock adguard brave; do
+            for file in "dist/$target"/*.txt; do cp "$file" "release/$target-$(basename "$file")"; done
+          done
+          cp dist/ublock/scriptlets.js release/ublock-scriptlets.js
+          cp dist/userscript/intentional.user.js release/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: release
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    outputs:
+      page_url: ${{ steps.pages.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4
+
+  release:
+    needs: [version, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: release
+          path: release
+      - name: Verify public subscriptions and redirect resources
+        working-directory: release
+        env:
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          for path in {ublock,adguard,brave}/intentional.txt ublock/scriptlets.js userscript/intentional.user.js; do
+            asset=${path/\//-}
+            if [[ "$path" == userscript/* ]]; then asset=${path#*/}; fi
+            for attempt in {1..6}; do
+              url="${PAGE_URL%/}/$path?revision=$GITHUB_SHA&attempt=$attempt"
+              if curl -fsSL --max-time 30 "$url" -o "$RUNNER_TEMP/served" && cmp "$asset" "$RUNNER_TEMP/served"; then break; fi
+              if [ "$attempt" = 6 ]; then echo "Pages did not serve the expected $path"; exit 1; fi
+              sleep 5
+            done
+          done
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: v${{ needs.version.outputs.version }}
+        run: |
+          if state=$(gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish); then
+            if [ "$(jq -r .isDraft <<<"$state")" = false ]; then
+              echo "Release $VERSION is already published"
+              exit 0
+            fi
+            if [ "$(jq -r .targetCommitish <<<"$state")" != "$GITHUB_SHA" ]; then
+              echo "Draft $VERSION targets another revision"; exit 1
+            fi
+          else
+            gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --generate-notes --draft
+          fi
+          cd release && sha256sum -- * > SHA256SUMS
+          gh release upload "$VERSION" --repo "$GITHUB_REPOSITORY" --clobber -- *
+          gh release edit "$VERSION" --repo "$GITHUB_REPOSITORY" --draft=false

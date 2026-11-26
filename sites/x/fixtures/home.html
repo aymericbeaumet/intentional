@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Home / X</title></head>
+<body>
+<div id="react-root">
+  <header role="banner">
+    <nav role="navigation" aria-label="Primary">
+      <a href="/home" role="link" data-testid="AppTabBar_Home_Link" id="nav-home">Home</a>
+      <a href="/explore" role="link" data-testid="AppTabBar_Explore_Link" id="nav-explore">Explore</a>
+      <a href="/notifications" role="link" data-testid="AppTabBar_Notifications_Link" id="nav-notifications">Notifications</a>
+    </nav>
+  </header>
+  <main role="main">
+    <div data-testid="primaryColumn">
+      <div aria-label="Home timeline">
+        <div id="timeline-header">
+          <nav role="navigation">
+            <div role="tablist" data-testid="ScrollSnap-List">
+              <div role="presentation"><a href="/home" role="tab" aria-selected="true" id="tab-for-you"><div><span>For you</span></div></a></div>
+              <div role="presentation"><a href="/home" role="tab" aria-selected="false" id="tab-following"><div><span>Following</span></div></a></div>
+              <div role="presentation"><a href="/home" role="tab" aria-selected="false" id="tab-list"><div><span>My list</span></div></a></div>
+            </div>
+          </nav>
+        </div>
+        <div id="compose"><div data-testid="tweetTextarea_0" role="textbox">What is happening?!</div></div>
+        <section role="region">
+          <h1 role="heading">Your Home Timeline</h1>
+          <div aria-label="Timeline: Your Home Timeline">
+            <div id="for-you-timeline">
+              <div data-testid="cellInnerDiv"><article data-testid="tweet"><a href="/someone/status/1111111111111111111">Recommended post</a></article></div>
+            </div>
+            <div id="following-timeline" hidden>
+              <div data-testid="cellInnerDiv" id="following-tweet"><article data-testid="tweet"><a href="/friend/status/2222222222222222222">Post from someone you follow</a></article></div>
+              <div data-testid="cellInnerDiv" id="wtf-heading"><div><h2 role="heading"><div dir="ltr"><span>Who to follow</span></div></h2></div></div>
+              <div data-testid="cellInnerDiv" id="wtf-user"><div data-testid="UserCell"><a href="/stranger">Stranger</a><button>Follow</button></div></div>
+              <div data-testid="cellInnerDiv" id="wtf-more"><div><a href="/i/connect_people?user_id=1" role="link">Show more</a></div></div>
+              <div data-testid="cellInnerDiv" id="following-tweet-2"><article data-testid="tweet"><a href="/friend/status/3333333333333333333">Another post from someone you follow</a></article></div>
+            </div>
+            <div id="list-timeline" hidden>
+              <div data-testid="cellInnerDiv" id="list-tweet"><article data-testid="tweet"><a href="/friend/status/4444444444444444444">Post from your list</a></article></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div data-testid="sidebarColumn">
+      <form role="search" id="sidebar-search"><input data-testid="SearchBox_Search_Input" placeholder="Search"></form>
+      <div><aside role="complementary" aria-label="Who to follow" id="sidebar-wtf">
+        <h2 role="heading"><div dir="ltr"><span>Who to follow</span></div></h2>
+        <div data-testid="UserCell"><a href="/stranger">Stranger</a></div>
+        <a href="/i/connect_people" role="link">Show more</a>
+      </aside></div>
+      <div><section role="region" id="sidebar-trends">
+        <h1 role="heading">Trending now</h1>
+        <div aria-label="Timeline: Trending now"><div><div data-testid="trend">#Topic</div></div></div>
+      </section></div>
+      <div id="sidebar-news"><div data-testid="news_sidebar">Today's News</div></div>
+    </div>
+  </main>
+</div>
+<script>
+  // Simulates X's Home tabs: clicking one selects it and swaps the timeline.
+  (() => {
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const timelines = ["for-you-timeline", "following-timeline", "list-timeline"].map((id) => document.getElementById(id));
+    const select = (index) => {
+      tabs.forEach((tab, i) => tab.setAttribute("aria-selected", String(i === index)));
+      timelines.forEach((timeline, i) => { timeline.hidden = i !== index; });
+    };
+    tabs.forEach((tab, i) => tab.addEventListener("click", (event) => { event.preventDefault(); select(i); }));
+    // Test-only: a fragment picks the pinned list tab, as if chosen earlier.
+    if (location.hash === "#pinned-list") select(2);
+  })();
+</script>
+</body></html>

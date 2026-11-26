@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Search / X</title></head>
+<body>
+<div id="react-root">
+  <main role="main">
+    <div data-testid="primaryColumn">
+      <div>
+        <div id="search-header">
+          <form role="search"><input data-testid="SearchBox_Search_Input" placeholder="Search" id="search-input"></form>
+          <nav role="navigation">
+            <div role="tablist" data-testid="ScrollSnap-List">
+              <div role="presentation"><a href="/search?q=intentional" role="tab" aria-selected="true" id="search-tab-top">Top</a></div>
+              <div role="presentation"><a href="/search?q=intentional&amp;f=live" role="tab" aria-selected="false" id="search-tab-latest">Latest</a></div>
+            </div>
+          </nav>
+        </div>
+        <section role="region" id="search-results">
+          <h1 role="heading">Search timeline</h1>
+          <div aria-label="Timeline: Search timeline"><div>
+            <div data-testid="cellInnerDiv" id="search-tweet"><article data-testid="tweet"><a href="/someone/status/9999999999999999999">A result</a></article></div>
+          </div></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</body></html>

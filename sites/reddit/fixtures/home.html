@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Reddit - Home</title></head>
+<body>
+<shreddit-app pagetype="home" routename="frontpage" user-logged-in="true">
+  <reddit-header-large>
+    <a id="logo" href="/">Reddit</a>
+    <reddit-search-large id="search"><form action="/search/"><input name="q" type="text" placeholder="Search Reddit"></form></reddit-search-large>
+  </reddit-header-large>
+  <div id="left-sidebar-container">
+    <reddit-sidebar-nav>
+      <left-nav-top-section id="left-nav" home popular news explore>
+        <li id="nav-home" data-shown-by="home"><a href="/">Home</a></li>
+        <li id="nav-popular" data-shown-by="popular"><a href="https://www.reddit.com/r/popular/">Popular</a></li>
+        <li id="nav-explore" data-shown-by="explore"><a href="https://www.reddit.com/explore/">Explore</a></li>
+      </left-nav-top-section>
+      <ul id="nav-communities"><li><a id="nav-community" href="/r/programming/">r/programming</a></li></ul>
+    </reddit-sidebar-nav>
+  </div>
+  <div id="subgrid-container">
+    <main id="main-content">
+      <shreddit-feed reload-url="/svc/shreddit/feeds/interest-home-feed?feed=for-you">
+        <article id="post-joined" data-post-id="t3_aaaaaa">
+          <shreddit-post id="t3_aaaaaa" is-subscribed recommendation-source="" subreddit-name="programming" permalink="/r/programming/comments/aaaaaa/post/">
+            <span slot="credit-bar"><a href="/r/programming/">r/programming</a></span>
+            <a slot="full-post-link" href="/r/programming/comments/aaaaaa/post/">Post from a joined community</a>
+          </shreddit-post>
+        </article>
+        <hr>
+        <article id="post-recommended" data-post-id="t3_bbbbbb">
+          <shreddit-post id="t3_bbbbbb" recommendation-source="good_visits_on_subreddit" subreddit-name="elsewhere" permalink="/r/elsewhere/comments/bbbbbb/post/">
+            <span slot="credit-bar"><a href="/r/elsewhere/">r/elsewhere</a></span>
+            <a slot="full-post-link" href="/r/elsewhere/comments/bbbbbb/post/">Suggested for you</a>
+          </shreddit-post>
+        </article>
+        <hr>
+        <article id="post-unjoined" data-post-id="t3_cccccc">
+          <shreddit-post id="t3_cccccc" subreddit-name="another" permalink="/r/another/comments/cccccc/post/">
+            <span slot="credit-bar"><a href="/r/another/">r/another</a><shreddit-join-button data-testid="credit-bar-join-button" name="another">Join</shreddit-join-button></span>
+            <a slot="full-post-link" href="/r/another/comments/cccccc/post/">Popular near you</a>
+          </shreddit-post>
+        </article>
+        <in-feed-community-recommendations id="in-feed-communities">Suggested communities</in-feed-community-recommendations>
+      </shreddit-feed>
+    </main>
+    <div id="right-sidebar-container"><div id="right-sidebar-contents">
+      <aside id="recent-posts" aria-label="Recent posts">Recent posts</aside>
+      <aside id="popular-communities" class="right-rail-popular-communities" aria-label="Popular Communities"><ul><li id="popular-communities-list"><a href="/r/elsewhere/">r/elsewhere</a></li></ul></aside>
+      <div class="legal-links"><ul>
+        <li><faceplate-tracker id="link-popular" source="nav" noun="popular_menu"><a href="/r/popular/">Popular</a></faceplate-tracker></li>
+        <li><faceplate-tracker id="link-news" source="nav" noun="news_menu"><a href="/news/">News</a></faceplate-tracker></li>
+        <li><faceplate-tracker id="link-explore" source="nav" noun="explore_menu"><a href="/explore/">Explore</a></faceplate-tracker></li>
+        <li><faceplate-tracker id="link-policy" source="nav" noun="content_policy_menu"><a href="https://www.redditinc.com/policies/content-policy">Reddit Rules</a></faceplate-tracker></li>
+      </ul></div>
+    </div></div>
+  </div>
+</shreddit-app>
+<script>
+  // Stand-in for Reddit's component, which draws each entry in its shadow root only while the
+  // matching attribute (home, popular, explore) is set. Light DOM here so the tests can see it.
+  customElements.define("left-nav-top-section", class extends HTMLElement {
+    static observedAttributes = ["home", "popular", "explore"];
+    connectedCallback() { this.render(); }
+    attributeChangedCallback() { this.render(); }
+    render() {
+      for (const item of this.querySelectorAll("[data-shown-by]")) item.hidden = !this.hasAttribute(item.dataset.shownBy);
+    }
+  });
+</script>
+</body></html>

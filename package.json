@@ -1,0 +1,48 @@
+{
+  "name": "intentional",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Filter lists that remove algorithmic feeds and infinite scrolling, so you only see what you came for.",
+  "license": "MIT",
+  "author": "Aymeric Beaumet <hi@aymericbeaumet.com> (https://aymericbeaumet.com)",
+  "homepage": "https://aymericbeaumet.github.io/intentional/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aymericbeaumet/intentional.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node src/cli.ts build",
+    "site": "node src/cli.ts site",
+    "new-site": "node src/cli.ts new-site",
+    "capture": "node src/cli.ts capture",
+    "lint": "biome check . && node src/cli.ts lint",
+    "format": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit --project engine",
+    "test:browser": "vitest run --project browser",
+    "test:live": "vitest run --project live",
+    "browsers": "puppeteer browsers install chrome && puppeteer browsers install firefox"
+  },
+  "devDependencies": {
+    "@adguard/aglint": "3.0.3",
+    "@adguard/agtree": "4.4.0",
+    "@adguard/extended-css": "2.3.0",
+    "@adguard/scriptlets": "2.6.0",
+    "@adguard/tsurlfilter": "6.1.0",
+    "@biomejs/biome": "2.6.9",
+    "@gorhill/ubo-core": "0.1.30",
+    "@puppeteer/browsers": "3.2.7",
+    "@types/node": "26.6.10",
+    "ajv": "8.20.0",
+    "esbuild": "0.28.2",
+    "puppeteer": "25.18.1",
+    "selfsigned": "5.5.0",
+    "typescript": "7.0.2",
+    "vitest": "5.1.2",
+    "yaml": "2.9.1"
+  }
+}

@@ -1,0 +1,19 @@
+! Pinterest: see site.yaml for the policy and tests.yaml for what each rule must do.
+! `pinterest.com` also covers the country subdomains (fr.pinterest.com, uk.pinterest.com, ...).
+
+! --- Home feed, Explore and Today: the pin grid ---
+! The same grid shows boards, search and Following, so it is only hidden on these paths.
+pinterest.com##:matches-path(/^\/(homefeed\/?|ideas\/?|today\/?)?(\?|$)/) [data-test-id="grid"]
+pinterest.com##[data-test-id^="ideas-root-"]
+
+! --- Navigation: entries that only lead to discovery feeds ---
+pinterest.com##[data-test-id="today-tab"]
+pinterest.com##[data-test-id="ideas-tab"]
+pinterest.com##[data-test-id="shopping-tab"]
+
+! --- A pin opened by URL: the pin, no "More to explore" ---
+! The opened pin can be the first item of the related grid itself, so only the other grid items go.
+pinterest.com##[data-test-id="relatedPins"] [data-grid-item]:not(:has([data-test-id="CloseupMainPin"]))
+pinterest.com##[data-test-id="related-pins-title"]
+pinterest.com##[data-test-id="floating-more-like-this-button"]
+pinterest.com##[data-test-id="pin-metadata-drawer-related-interests-section"]

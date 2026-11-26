@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Following - Twitch</title></head>
+<body>
+<div id="root">
+  <nav data-a-target="top-nav-container">
+    <a data-a-target="home-link" href="/">Twitch</a>
+    <a data-a-target="following-link" id="following-link" href="/directory/following">Following</a>
+    <a data-a-target="browse-link" id="browse-link" href="/directory">Browse</a>
+  </nav>
+  <div class="side-nav" data-test-selector="side-nav" data-a-target="side-nav-bar" role="complementary">
+    <nav id="side-nav" aria-label="Left Navigation">
+      <div aria-label="Followed Channels" class="side-nav-section" role="group" id="followed-section">
+        <a data-a-id="followed-channel-0" data-test-selector="followed-channel" href="/followed">followed</a>
+      </div>
+      <div aria-label="Recommended Channels" class="side-nav-section" role="group" id="recommended-section">
+        <a data-a-id="recommended-channel-0" data-test-selector="recommended-channel" href="/someone">someone</a>
+      </div>
+    </nav>
+  </div>
+  <main>
+    <div data-a-target="root-scroller">
+      <h1>Following</h1>
+      <ul>
+        <li><a data-a-target="following-overview-tab" id="tab-overview" href="/directory/following">Overview</a></li>
+        <li><a data-a-target="following-live-tab" href="/directory/following/live">Live</a></li>
+        <li><a data-a-target="following-videos-tab" href="/directory/following/videos">Videos</a></li>
+        <li><a data-a-target="following-channels-tab" href="/directory/following/channels">Channels</a></li>
+      </ul>
+      <div id="live-following">
+        <h2>Live channels</h2>
+        <article id="followed-live-card"><a data-a-target="preview-card-image-link" href="/followed">Followed stream</a></article>
+      </div>
+      <div class="find-me" id="recommended-shelf">
+        <h2 id="rec-title">Recommended channels</h2>
+        <div aria-labelledby="rec-title"><div class="shelf-card__impression-wrapper"><div data-test-selector="shelf-card-selector"><a data-a-target="preview-card-image-link" href="/someone">Recommended stream</a></div></div></div>
+      </div>
+      <div id="latest-videos"><h2>Latest videos</h2><a data-a-target="followed-vod-0" href="/videos/1111111111">A followed channel's video</a></div>
+    </div>
+  </main>
+</div>
+</body></html>

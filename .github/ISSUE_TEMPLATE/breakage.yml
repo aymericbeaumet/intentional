@@ -1,0 +1,45 @@
+name: Something is broken
+description: A site changed, something that should be hidden shows up, or something you need is gone.
+labels: [breakage]
+body:
+  - type: input
+    id: site
+    attributes:
+      label: Site
+      placeholder: YouTube
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: Remove anything personal from it.
+      placeholder: https://www.youtube.com/feed/subscriptions
+    validations:
+      required: true
+  - type: dropdown
+    id: blocker
+    attributes:
+      label: Blocker
+      options:
+        - uBlock Origin
+        - uBlock Origin Lite
+        - AdGuard (extension)
+        - AdGuard (app)
+        - Brave Shields
+        - Userscript
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Firefox 160 on macOS
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+      description: A screenshot helps (crop out anything personal).
+    validations:
+      required: true

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Post - Reddit</title></head>
+<body>
+<shreddit-app pagetype="post_detail" routename="post_page" user-logged-in="true">
+  <reddit-header-large><a id="logo" href="/">Reddit</a></reddit-header-large>
+  <div id="subgrid-container">
+    <main id="main-content">
+      <shreddit-post id="t3_gggggg" subreddit-name="elsewhere" permalink="/r/elsewhere/comments/gggggg/post/">
+        <span slot="credit-bar"><a href="/r/elsewhere/">r/elsewhere</a><shreddit-join-button id="post-join" data-testid="credit-bar-join-button" name="elsewhere">Join</shreddit-join-button></span>
+        <h1 id="post-title" slot="title">A post opened by URL</h1>
+        <shreddit-player id="post-video"><video></video><div id="video-recommendations" slot="recommendation-overlay">Watch next</div></shreddit-player>
+      </shreddit-post>
+      <shreddit-comment-tree id="comments"><shreddit-comment>A comment</shreddit-comment></shreddit-comment-tree>
+    </main>
+    <div id="right-sidebar-container"><div id="right-sidebar-contents">
+      <section id="community-info">About r/elsewhere</section>
+      <aside id="answers-suggested-queries-pdp" aria-label="People also ask about section">People also ask about</aside>
+      <div id="pdp-right-rail-after-answers" class="contents">
+        <aside id="related-posts" aria-label="Related Posts Section">
+          <h1>More posts you may like</h1>
+          <pdp-right-rail><ul><li><reddit-pdp-right-rail-post><a href="/r/elsewhere/comments/hhhhhh/post/">Related post</a></reddit-pdp-right-rail-post></li></ul></pdp-right-rail>
+        </aside>
+      </div>
+    </div></div>
+  </div>
+</shreddit-app>
+</body></html>

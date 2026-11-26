@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: bluesky
+name: Bluesky
+domains: [bsky.app]
+hosts: [bsky.app]
+
+intentional:
+  - label: Following
+    url: https://bsky.app/?feed=following
+
+policy:
+  allowed:
+    - A single post opened by URL, with its replies
+    - The Following feed, and the feeds and lists you pinned yourself
+    - Profiles, lists and feeds opened by URL
+    - Search results
+    - Notifications, chat, bookmarks and settings
+  blocked:
+    - The Discover feed (its home tab, its page, and the link in the desktop sidebar)
+    - Trending topics in the sidebar, and trending topic feeds (redirect to Following)
+    - The Explore page shown on Search before you type a query
+    - Suggested accounts injected into profile timelines
+  limitations:
+    - The Following feed is a tab on the home screen. With redirects on, the list switches to it whenever Discover is showing; other feeds you pinned yourself stay reachable.
+    - Switching tabs and hiding the Discover tab and the suggested-accounts box use Bluesky's English labels. In other languages the Discover feed is still hidden, but you pick Following yourself.
+    - Custom algorithmic feeds you pin yourself are your choice and stay visible.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), Discover is hidden but Bluesky doesn't switch to Following for you; tap it once and Bluesky remembers it.
+
+redirects:
+  - from: '^/profile/(bsky\.app|did:plc:z72i7hdynmk6r22z27h6tvur)/feed/whats-hot/?(\?|$)'
+    to: /?feed=following
+  - from: '^/profile/(trending\.bsky\.app|did:plc:qrz3lhbyuxbeilrc6nekdqme)/feed/'
+    to: /?feed=following
+  - from: '^/\?(.*&)?feed=feedgen(%7[Cc]|\|)at(%3[Aa]|:)(%2[Ff]|/){2}did(%3[Aa]|:)plc(%3[Aa]|:)z72i7hdynmk6r22z27h6tvur(%2[Ff]|/)app\.bsky\.feed\.generator(%2[Ff]|/)whats-hot(&|$)'
+    to: /?feed=following
+
+select:
+  - when: '^/(\?.*)?$'
+    click: '[role="tab"]:has([data-testid="homeScreenFeedTabs-Following"])'
+    selected: '[data-testid="homeScreen"] > div:not([style*="display: none"]) > [data-testid$="FeedPage"]:not([data-nosnippet])'

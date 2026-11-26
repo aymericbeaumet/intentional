@@ -1,0 +1,349 @@
+! Title: Intentional (Brave)
+! Description: Removes algorithmic feeds and infinite scrolling, so you only see what you came for. Sites: Bluesky, Facebook, Instagram, LinkedIn, Pinterest, Reddit, Threads, TikTok, Twitch, X, YouTube.
+! Homepage: https://aymericbeaumet.github.io/intentional/
+! License: MIT
+! Version: 0.0.0-snapshot
+! Expires: 1 day
+! Redirects need the userscript: https://aymericbeaumet.github.io/intentional/userscript/intentional.user.js
+
+! ===== Bluesky =====
+! Bluesky: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Discover feed on the home screen ---
+! Bluesky marks the Discover feed page with data-nosnippet, in every language.
+bsky.app##[data-testid="customFeedPage"][data-nosnippet]
+! Tab labels are localized: this one only matches the English UI.
+bsky.app##[role="tab"]:has([data-testid="homeScreenFeedTabs-Discover"])
+! Discover in the desktop sidebar's list of pinned feeds.
+bsky.app##[role="link"][aria-label="Discover"]
+! The Discover feed opened by URL (redirected when redirects are on).
+bsky.app##:matches-path(/^\/profile\/(bsky\.app|did:plc:z72i7hdynmk6r22z27h6tvur)\/feed\/whats-hot\/?(\?|$)/) [data-testid="customFeedScreen"]
+
+! --- Trending topics (sidebar and Explore) ---
+! Every trending topic links to a feed of the trending.bsky.app account.
+bsky.app##div:has(> div > a[href^="/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/"])
+bsky.app##:matches-path(/^\/profile\/(trending\.bsky\.app|did:plc:qrz3lhbyuxbeilrc6nekdqme)\/feed\//) [data-testid="customFeedScreen"]
+
+! --- Explore: what Search shows before you type a query ---
+bsky.app##:matches-path(/^\/search\/?$/) [data-testid="searchScreen"] > div:nth-child(2) > div:first-child
+
+! --- Suggested accounts injected into timelines ---
+bsky.app##div:has(> div > div > [aria-label="See more suggested profiles"])
+
+! ===== Facebook =====
+! Facebook: see site.yaml for the policy and tests.yaml for what each rule must do.
+! Class names are generated and change constantly: rules anchor on href, role, aria-posinset and data-* attributes.
+
+! --- Algorithmic home feed, when redirects are off ---
+! The path regex reads the query: Feeds (?sk=h_chr, any filter) keeps its posts.
+www.facebook.com##:matches-path(/^\/(?:home\.php)?(?:\?(?!(?:.*&)?sk=h_chr(?:&|$)).*)?$/) div[role="main"] div[aria-posinset]
+
+! --- Growth injections in feeds: People you may know, suggested groups ---
+www.facebook.com##div[aria-posinset]:has(a:is([href="/friends/"],[href^="/friends/suggestions"],[href="https://www.facebook.com/friends/"],[href^="https://www.facebook.com/friends/suggestions"]))
+www.facebook.com##div[aria-posinset]:has(a:is([href^="/groups/discover"],[href^="https://www.facebook.com/groups/discover"]))
+
+! --- Suggested posts (English label) ---
+www.facebook.com##div[aria-posinset]:has(span:has-text(/^Suggested for you$/))
+
+! --- Reels carousels: "Reels and short videos" in feeds, "Related Reels" under videos ---
+www.facebook.com##div[aria-posinset]:has(div[data-type="hscroll-child"] a[href*="/reel/"])
+www.facebook.com##div:has(> div > div[role="region"] div[data-type="hscroll-child"] a[href*="/reel/"])
+
+! --- Reel player: the opened reel plays, without its previous/next card buttons ---
+www.facebook.com##div:has(> div [data-pagelet="Reels"]) > div[role="button"]
+
+! --- Entry points: Video home and its Live, Shows and Explore tabs (a video link keeps working) ---
+www.facebook.com##a:is([href="/watch/"],[href^="/watch/?"],[href^="/watch/live/"],[href^="/watch/shows/"],[href^="/watch/topic/"],[href="https://www.facebook.com/watch/"],[href^="https://www.facebook.com/watch/?"]):not([href*="?v="],[href*="&v="])
+
+! --- Entry points: the Reels tab (a reel link keeps working) ---
+www.facebook.com##a:is([href="/reel/"],[href^="/reel/?"],[href="https://www.facebook.com/reel/"],[href^="https://www.facebook.com/reel/?"])
+
+! --- Entry points: Gaming home and its video feeds (a streamer's page stays) ---
+www.facebook.com##a:is([href="/gaming/"],[href^="/gaming/?"],[href^="/gaming/feed/"],[href^="/gaming/video/"],[href="https://www.facebook.com/gaming/"],[href^="https://www.facebook.com/gaming/?"],[href^="https://www.facebook.com/gaming/feed/"],[href^="https://www.facebook.com/gaming/video/"])
+
+! ===== Instagram =====
+! Instagram: see site.yaml for the policy and tests.yaml for what each rule must do.
+! Class names are generated and change constantly: rules anchor on href, role and structure.
+
+! --- Entry points: Explore and the Reels feed (a profile's own Reels tab stays) ---
+www.instagram.com##a[href="/explore/"]
+www.instagram.com##a[href="/reels/"]
+
+! --- "For you" home feed, when redirects are off ---
+! The path regex reads the query: /?variant=following and /?variant=favorites keep their posts.
+www.instagram.com##:matches-path(/^\/(?:\?(?!(?:.*&)?variant=(?:following|favorites)(?:&|$)).*)?$/) main article
+
+! --- Suggested posts and reels mixed into feeds (English labels) ---
+www.instagram.com##article:has(span:has-text(/^Suggested (?:for you|posts|reels|threads)$/))
+
+! --- Suggested accounts: sidebar and feed carousels ("See all" leads to /explore/people/), profiles ---
+www.instagram.com##div:has(> div > a[href^="/explore/people/"])
+www.instagram.com##div:has(> div > a[href$="/related_profiles/"])
+
+! --- Explore grid, when redirects are off (the search box above it stays) ---
+www.instagram.com##:matches-path(/^\/explore\/?(?:\?.*)?$/) main a:is([href*="/p/"],[href*="/reel/"])
+
+! --- Reels feed, when redirects are off: the opened reel plays, the next ones and the up/down buttons are gone ---
+www.instagram.com##main > div[role="toolbar"]
+www.instagram.com##main:has(> div[role="toolbar"]) > div:first-child > div:nth-child(n+2)
+
+! ===== LinkedIn =====
+! LinkedIn: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Home feed: the feed root (/feed/, with or without a query) ---
+! Redirects send it to Notifications; this is the fallback without redirects. Single posts
+! (/feed/update/…) are another path. Links that highlight a post keep the feed so the post shows.
+www.linkedin.com##:matches-path(/^\/feed\/?(?:\?(?!(?:.*&)?highlightedUpdateUrns=urn(?::|%3[Aa])li(?::|%3[Aa])[A-Za-z]+(?::|%3[Aa])[0-9]+(?:&|,|%2[Cc]|$)).*)?$/) :is(main, aside)
+
+! --- Feed: no further pages load ---
+! Lowercase on purpose: patterns match case-insensitively, and uBO reports them lowercased.
+||www.linkedin.com/flagship-web/rsc-action/actions/pagination?*sduiid=com.linkedin.sdui.pagers.feed.mainfeed$xhr,1p
+
+! --- Home nav item: it only leads to the feed ---
+! New top bar (Home is a button), then the older one still used on some pages.
+www.linkedin.com##[data-testid="primary-nav"] li:has(button[aria-label^="Home"])
+www.linkedin.com##li.global-nav__primary-item:has(a[href*="/feed/"])
+
+! --- Side rails: LinkedIn News and "Add to your feed" ---
+! Older layout hooks.
+www.linkedin.com###feed-news-module
+www.linkedin.com##[data-view-name="feed-news-module"]
+www.linkedin.com##.feed-follows-module
+! New layout: no stable hook. From the module's heading (a <p> there), up to the closest
+! module of the rail (never past the rail itself).
+www.linkedin.com##aside p:has-text(/^\s*(LinkedIn News|Add to your feed)\s*$/):upward(aside [componentkey])
+
+! --- Side rails: "People you may know" next to profiles ---
+www.linkedin.com##aside :is(h2, h3):has-text(/^\s*(People you may know|More profiles for you)/):upward(aside section)
+
+! --- My Network: "People you may know" and other suggestion cards ---
+! The page stays (invitations and your network are yours); its suggestion cards are found by
+! their "Invite … to connect" and "Follow …" buttons.
+www.linkedin.com##:matches-path(/^\/mynetwork\/(grow\/?)?(\?.*)?$/) button[aria-label^="Invite "][aria-label$=" to connect"]:upward(:is(li, [role="listitem"]))
+www.linkedin.com##:matches-path(/^\/mynetwork\/(grow\/?)?(\?.*)?$/) button[aria-label^="Follow "]:upward(:is(li, [role="listitem"]))
+
+! --- Promoted: ads in the side rails ---
+www.linkedin.com##aside div:has(> iframe[title="advertisement"])
+www.linkedin.com##section:has(> iframe[data-ad-banner])
+
+! ===== Pinterest =====
+! Pinterest: see site.yaml for the policy and tests.yaml for what each rule must do.
+! `pinterest.com` also covers the country subdomains (fr.pinterest.com, uk.pinterest.com, ...).
+
+! --- Home feed, Explore and Today: the pin grid ---
+! The same grid shows boards, search and Following, so it is only hidden on these paths.
+pinterest.com##:matches-path(/^\/(homefeed\/?|ideas\/?|today\/?)?(\?|$)/) [data-test-id="grid"]
+pinterest.com##[data-test-id^="ideas-root-"]
+
+! --- Navigation: entries that only lead to discovery feeds ---
+pinterest.com##[data-test-id="today-tab"]
+pinterest.com##[data-test-id="ideas-tab"]
+pinterest.com##[data-test-id="shopping-tab"]
+
+! --- A pin opened by URL: the pin, no "More to explore" ---
+! The opened pin can be the first item of the related grid itself, so only the other grid items go.
+pinterest.com##[data-test-id="relatedPins"] [data-grid-item]:not(:has([data-test-id="CloseupMainPin"]))
+pinterest.com##[data-test-id="related-pins-title"]
+pinterest.com##[data-test-id="floating-more-like-this-button"]
+pinterest.com##[data-test-id="pin-metadata-drawer-related-interests-section"]
+
+! ===== Reddit =====
+! Reddit: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- r/popular, r/all, Explore, News: their feeds ---
+! Redirects send these pages to Home; this is the fallback without redirects.
+! The logged-out front page is r/popular too (pagetype="popular").
+www.reddit.com##shreddit-app[pagetype="popular"] #main-content
+www.reddit.com##shreddit-app[pagetype="all"] #main-content
+www.reddit.com##shreddit-app[pagetype="explore"] #main-content
+www.reddit.com##shreddit-app[pagetype="news"] #main-content
+
+! --- Entry points to those feeds ---
+! The left menu draws Popular and Explore in its shadow root, switched on by these attributes.
+www.reddit.com##+js(remove-attr, popular|explore|news, left-nav-top-section, asap stay)
+! Sidebar and footer links.
+www.reddit.com##faceplate-tracker:is([noun="popular_menu"], [noun="explore_menu"], [noun="news_menu"])
+! Old Reddit's top bar.
+old.reddit.com##.sr-bar > li:has(> a[href$="/r/popular/"])
+old.reddit.com##.sr-bar > li:has(> a[href$="/r/all/"])
+
+! --- Feeds: posts Reddit recommends instead of what you joined ---
+! Recommended posts name why they were picked in recommendation-source.
+www.reddit.com##shreddit-feed > article:has(> shreddit-post[recommendation-source]:not([recommendation-source=""]))
+! In Home, a Join button means the post comes from a community you haven't joined.
+www.reddit.com##shreddit-feed[reload-url*="home-feed"] > article:has(shreddit-join-button)
+
+! --- Suggested communities ---
+www.reddit.com##in-feed-community-recommendations
+www.reddit.com##aside.right-rail-popular-communities
+
+! --- Next to a post: related posts, "People also ask about", video end screens ---
+www.reddit.com##aside:has(> pdp-right-rail)
+www.reddit.com###answers-suggested-queries-pdp
+www.reddit.com##shreddit-player [slot="recommendation-overlay"]
+
+! --- Search box: trending searches and trending communities ---
+! They render in the search box's shadow root, so block the request that loads them:
+! the typeahead with an empty query. Typing still gets suggestions.
+||www.reddit.com/svc/shreddit/search-typeahead?query=&$xhr,1p
+
+! ===== Threads =====
+! Threads: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- For you feed ---
+! Each column has a header whose title links to the column's own page, then a
+! sibling holding the column body (role="region"). Hide the body of the column
+! titled /for_you, wherever it is shown (home page, or pinned next to others).
+www.threads.com##div:has(a[href="/for_you"][aria-label]) + div:has(> [role="region"])
+
+! ===== TikTok =====
+! TikTok: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- For You and Explore feeds (both redirect to Following) ---
+! TikTok names each page's root `main-content-<page>`, before and after in-app navigation.
+www.tiktok.com###main-content-homepage_hot
+www.tiktok.com###main-content-explore_page
+||tiktok.com/api/recommend/item_list$xhr,1p
+||tiktok.com/api/prefetch/recommend/item_list$xhr,1p
+||tiktok.com/api/explore/item_list$xhr,1p
+||tiktok.com/api/prefetch/explore/item_list$xhr,1p
+
+! --- Side navigation: entries that only lead to algorithmic feeds ---
+www.tiktok.com##a[data-e2e="nav-foryou"]
+www.tiktok.com##a[data-e2e="nav-explore"]
+www.tiktok.com##a[data-e2e="nav-live"]
+www.tiktok.com##a[data-e2e="nav-short-drama"]
+
+! --- A video opened by URL: the video and its comments, no queue of next videos ---
+! The related list feeds the videos stacked under the opened one; the opened video is server-rendered.
+||tiktok.com/api/related/item_list$xhr,1p
+www.tiktok.com###main-content-video_detail [data-e2e="recommend-list-item-container"]:not([data-scroll-index="0"])
+www.tiktok.com###main-content-video_detail [data-e2e="feed-navigation-prev"]
+www.tiktok.com###main-content-video_detail [data-e2e="feed-navigation-next"]
+www.tiktok.com###main-content-video_detail [data-testid="tux-web-tab-bar-container"]:has-text(/^\s*You may like\s*$/)
+
+! --- Suggested accounts (Following page, profiles) ---
+www.tiktok.com###main-content-homepage_follow [data-e2e="recommend-card"]
+www.tiktok.com##[data-testid="tux-web-button-container"]:has(> [data-e2e="show-suggested-accounts"])
+www.tiktok.com##[data-e2e="user-page"] div:has(> div > div > [aria-label="View All"])
+
+! --- LIVE: the For You LIVE feed and its entry points (the hub redirects to Following LIVE) ---
+www.tiktok.com##a[data-e2e="nav-discover-live"]
+www.tiktok.com##a[data-e2e="discover-nav-category-tab"][href="/live"]
+www.tiktok.com##:matches-path(/^\/live\/?(\?|$)/) [data-e2e="discover-list-live-card"]
+www.tiktok.com##:matches-path(/^\/live\/?(\?|$)/) [data-e2e="discover_category-list-live-card"]
+
+! --- Short dramas hub (redirects to Following) ---
+www.tiktok.com##[data-e2e="short-drama-library-page"]
+
+! ===== Twitch =====
+! Twitch: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Front page: featured carousel and recommendation shelves (redirects to Following) ---
+www.twitch.tv##[data-a-target="front-page-carousel"]
+www.twitch.tv##[data-a-target="front-page-main-content"]
+
+! --- Browse: entry point (Browse redirects to Following) ---
+www.twitch.tv##a[data-a-target="browse-link"]
+
+! --- Side navigation: recommendation sections; Followed Channels stays ---
+! Each section is a `.side-nav-section`; its cards say where they come from in data-test-selector.
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="recommended-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="recommended-collab-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="popular-channel"])
+www.twitch.tv##.side-nav-section:has(a[data-test-selector="similarity-channel"])
+www.twitch.tv##.side-nav-section:has([data-test-selector="category"])
+
+! --- Following page: the "Recommended channels" shelf ---
+! Recommendation shelves render as `.find-me` with shelf cards; followed live channels use other cards.
+www.twitch.tv##.find-me:has([data-test-selector="shelf-card-selector"])
+
+! --- Mobile site: the Live tab, the Browse entry and the front page feed ---
+m.twitch.tv##li[role="presentation"]:has(> a[role="tab"][href="/"])
+m.twitch.tv##a[href="/directory"]
+m.twitch.tv##:matches-path(/^\/(\?|$)/) #page-main-content-wrapper
+
+! ===== X =====
+! X: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Home: the For you timeline ---
+! The first Home tab links to /home. Native CSS releases the timeline as soon as
+! X changes aria-selected, including when switching tabs without re-rendering.
+x.com##main:has([role="tablist"] > div:first-child > [role="tab"][href="/home"][aria-selected="true"]) [data-testid="primaryColumn"] section
+x.com##[role="tablist"] > div:first-child:has(> [role="tab"][href="/home"])
+
+! --- Who to follow modules in timelines ---
+! A heading cell right before account cells, the account cells, the "Show more" cell.
+x.com##:matches-path(/^\/home\/?(\?|$)/) [data-testid="cellInnerDiv"]:has(h2):has(+ [data-testid="cellInnerDiv"] [data-testid="UserCell"])
+x.com##:matches-path(/^\/home\/?(\?|$)/) [data-testid="cellInnerDiv"]:has([data-testid="UserCell"])
+x.com##[data-testid="cellInnerDiv"]:has(a[href^="/i/connect_people"])
+
+! --- Post page: "Discover more" and every post after it ---
+! Its heading is the only one followed by a description line (div[dir]).
+x.com##:matches-path(/\/status\/\d+/) [data-testid="cellInnerDiv"]:has(h2[role="heading"] + div[dir])
+x.com##:matches-path(/\/status\/\d+/) [data-testid="cellInnerDiv"]:has(h2[role="heading"] + div[dir]) ~ [data-testid="cellInnerDiv"]
+
+! --- Sidebar: Who to follow, Relevant people, Trending, Today's News ---
+x.com##[data-testid="sidebarColumn"] aside[role="complementary"]:has([data-testid="UserCell"])
+x.com##[data-testid="sidebarColumn"] section:has([data-testid="trend"])
+x.com##[data-testid="sidebarColumn"] div:has(> [data-testid="news_sidebar"])
+! "You might like" on a profile, after following it.
+x.com##[data-testid="primaryColumn"] aside[role="complementary"]:has(a[href^="/i/connect_people"])
+
+! --- Explore, Trending, Who to follow pages (redirected when redirects are on) ---
+x.com##nav a[href="/explore"]
+x.com##:matches-path(/^\/(explore|i\/trends|i\/connect_people)\b/) [data-testid="primaryColumn"] section
+
+! ===== YouTube =====
+! YouTube: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Home feed ---
+! page-subtype follows in-app navigation, so this keeps working after clicks.
+www.youtube.com##ytd-browse[page-subtype="home"]
+www.youtube.com##ytd-guide-entry-renderer:has(a[href="/"])
+www.youtube.com##ytd-mini-guide-entry-renderer:has(a[href="/"])
+m.youtube.com##div[tab-identifier="FEwhat_to_watch"]
+m.youtube.com##ytm-pivot-bar-item-renderer:has(.pivot-w2w)
+
+! --- Explore / Trending ---
+www.youtube.com##ytd-browse[page-subtype="trending"]
+
+! --- Shorts: entry points ---
+www.youtube.com##ytd-guide-entry-renderer:has(a[title="Shorts"])
+www.youtube.com##ytd-mini-guide-entry-renderer[aria-label="Shorts"]
+www.youtube.com##yt-tab-shape[tab-title="Shorts"]
+www.youtube.com##yt-chip-cloud-chip-renderer:has-text(/^\s*Shorts\s*$/)
+m.youtube.com##ytm-pivot-bar-item-renderer:has(.pivot-shorts)
+
+! --- Shorts: shelves and tiles (home, subscriptions, search, channels) ---
+www.youtube.com##ytd-reel-shelf-renderer
+www.youtube.com##ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts])
+www.youtube.com##grid-shelf-view-model:has(a[href^="/shorts/"])
+www.youtube.com##ytd-rich-item-renderer:has(a[href^="/shorts/"])
+www.youtube.com##ytd-video-renderer:has(a[href^="/shorts/"])
+www.youtube.com##ytd-grid-video-renderer:has(a[href^="/shorts/"])
+www.youtube.com##yt-lockup-view-model:has(a[href^="/shorts/"])
+m.youtube.com##ytm-reel-shelf-renderer
+m.youtube.com##ytm-shorts-lockup-view-model
+m.youtube.com##ytm-shorts-lockup-view-model-v2
+m.youtube.com##ytm-rich-item-renderer:has(a[href^="/shorts/"])
+m.youtube.com##ytm-video-with-context-renderer:has(a[href^="/shorts/"])
+
+! --- Shorts player: one Short, no next one ---
+! The sequence endpoint feeds the swipe-to-next queue; the opened Short itself still loads.
+||youtube.com/youtubei/v1/reel/reel_watch_sequence$xhr,1p
+www.youtube.com##ytd-shorts #navigation-button-up
+www.youtube.com##ytd-shorts #navigation-button-down
+
+! --- Watch page: no next video ---
+www.youtube.com###related
+www.youtube.com##ytd-watch-next-secondary-results-renderer
+www.youtube.com,m.youtube.com##.ytp-endscreen-content
+www.youtube.com,m.youtube.com##.videowall-endscreen
+www.youtube.com,m.youtube.com##.ytp-ce-element
+www.youtube.com##.ytp-fullscreen-grid
+m.youtube.com##ytm-item-section-renderer[section-identifier="related-items"]
+
+! --- Search: injected recommendation shelves ---
+www.youtube.com##ytd-search ytd-shelf-renderer
+www.youtube.com##ytd-search ytd-horizontal-card-list-renderer

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Browse - Twitch</title></head>
+<body>
+<div id="root">
+  <nav data-a-target="top-nav-container">
+    <a data-a-target="following-link" id="following-link" href="/directory/following">Following</a>
+    <a data-a-target="browse-link" id="browse-link" href="/directory">Browse</a>
+  </nav>
+  <div class="side-nav" data-test-selector="side-nav" data-a-target="side-nav-bar" role="complementary">
+    <nav id="side-nav" aria-label="Left Navigation">
+      <div aria-label="Followed Channels" class="side-nav-section" role="group" id="followed-section">
+        <a data-a-id="followed-channel-0" data-test-selector="followed-channel" href="/followed">followed</a>
+      </div>
+      <div aria-label="Recommended Channels" class="side-nav-section" role="group" id="recommended-section">
+        <a data-a-id="recommended-channel-0" data-test-selector="recommended-channel" href="/someone">someone</a>
+      </div>
+    </nav>
+  </div>
+  <main>
+    <div data-a-target="root-scroller">
+      <ul data-a-target="browse-type-tab-list">
+        <li><a data-a-target="browse-type-tab-categories" href="/directory">Categories</a></li>
+        <li><a data-a-target="browse-type-tab-live-channels" href="/directory/all">Live Channels</a></li>
+      </ul>
+      <div id="browse-grid"><a data-a-target="tw-box-art-card-link" href="/directory/category/just-chatting">Just Chatting</a></div>
+    </div>
+  </main>
+</div>
+</body></html>

@@ -1,0 +1,63 @@
+// ==UserScript==
+// @name         Intentional
+// @namespace    https://aymericbeaumet.github.io/intentional/
+// @version      0.0.0-snapshot
+// @description  Redirects algorithmic feeds to the views you chose: subscriptions, following, notifications.
+// @homepageURL  https://aymericbeaumet.github.io/intentional/
+// @downloadURL  https://aymericbeaumet.github.io/intentional/userscript/intentional.user.js
+// @updateURL    https://aymericbeaumet.github.io/intentional/userscript/intentional.user.js
+// @license      MIT
+// @match        https://bsky.app/*
+// @match        https://www.facebook.com/*
+// @match        https://www.instagram.com/*
+// @match        https://www.linkedin.com/*
+// @match        https://www.pinterest.com/*
+// @match        https://ar.pinterest.com/*
+// @match        https://at.pinterest.com/*
+// @match        https://au.pinterest.com/*
+// @match        https://br.pinterest.com/*
+// @match        https://ca.pinterest.com/*
+// @match        https://ch.pinterest.com/*
+// @match        https://cl.pinterest.com/*
+// @match        https://co.pinterest.com/*
+// @match        https://cz.pinterest.com/*
+// @match        https://de.pinterest.com/*
+// @match        https://dk.pinterest.com/*
+// @match        https://es.pinterest.com/*
+// @match        https://fi.pinterest.com/*
+// @match        https://fr.pinterest.com/*
+// @match        https://gr.pinterest.com/*
+// @match        https://hu.pinterest.com/*
+// @match        https://id.pinterest.com/*
+// @match        https://ie.pinterest.com/*
+// @match        https://in.pinterest.com/*
+// @match        https://it.pinterest.com/*
+// @match        https://jp.pinterest.com/*
+// @match        https://kr.pinterest.com/*
+// @match        https://mx.pinterest.com/*
+// @match        https://nl.pinterest.com/*
+// @match        https://no.pinterest.com/*
+// @match        https://nz.pinterest.com/*
+// @match        https://ph.pinterest.com/*
+// @match        https://pl.pinterest.com/*
+// @match        https://pt.pinterest.com/*
+// @match        https://ro.pinterest.com/*
+// @match        https://ru.pinterest.com/*
+// @match        https://se.pinterest.com/*
+// @match        https://sk.pinterest.com/*
+// @match        https://tr.pinterest.com/*
+// @match        https://uk.pinterest.com/*
+// @match        https://za.pinterest.com/*
+// @match        https://www.reddit.com/*
+// @match        https://www.threads.com/*
+// @match        https://www.tiktok.com/*
+// @match        https://www.twitch.tv/*
+// @match        https://m.twitch.tv/*
+// @match        https://x.com/*
+// @match        https://www.youtube.com/*
+// @match        https://m.youtube.com/*
+// @run-at       document-start
+// @grant        none
+// ==/UserScript==
+
+(function(){function g(l,o){for(const i of o){const c=new RegExp(i.from).exec(l);if(!c)continue;const s=i.to.replace(/\$(\d)/g,(d,a)=>c[Number(a)]??"");return s===l?null:s}return null}function $(l,o){const i=o.document;let c=0,s=!1,d=null;const a=()=>{try{const e="intentional:redirects",r=Date.now(),t=JSON.parse(o.sessionStorage.getItem(e)||"[]").filter(f=>r-f<1e4);if(t.length>=3)return!1;t.push(r),o.sessionStorage.setItem(e,JSON.stringify(t))}catch{}return!0},n=()=>{s=!1;const e=o.location.pathname+o.location.search;if(e===d)return;const r=g(e,l.redirects);if(r!==null){d=e,a()&&o.location.replace(r);return}d=null;for(const t of l.select){if(!new RegExp(t.when).test(e)||i.querySelector(t.selected))continue;const f=i.querySelector(t.click),w=Date.now();f instanceof o.HTMLElement&&w-c>1e3&&(c=w,f.click())}},p=()=>{s||(s=!0,o.setTimeout(n,50))};for(const e of["pushState","replaceState"]){const r=o.history[e];o.history[e]=function(...t){const f=r.apply(this,t);return n(),f}}o.addEventListener("popstate",n),l.select.length>0&&new o.MutationObserver(p).observe(i,{childList:!0,subtree:!0}),o.setInterval(n,1e3),n()}var m={"bsky.app":{redirects:[{from:"^/profile/(bsky\\.app|did:plc:z72i7hdynmk6r22z27h6tvur)/feed/whats-hot/?(\\?|$)",to:"/?feed=following"},{from:"^/profile/(trending\\.bsky\\.app|did:plc:qrz3lhbyuxbeilrc6nekdqme)/feed/",to:"/?feed=following"},{from:"^/\\?(.*&)?feed=feedgen(%7[Cc]|\\|)at(%3[Aa]|:)(%2[Ff]|/){2}did(%3[Aa]|:)plc(%3[Aa]|:)z72i7hdynmk6r22z27h6tvur(%2[Ff]|/)app\\.bsky\\.feed\\.generator(%2[Ff]|/)whats-hot(&|$)",to:"/?feed=following"}],select:[{when:"^/(\\?.*)?$",click:'[role="tab"]:has([data-testid="homeScreenFeedTabs-Following"])',selected:'[data-testid="homeScreen"] > div:not([style*="display: none"]) > [data-testid$="FeedPage"]:not([data-nosnippet])'}]},"www.facebook.com":{redirects:[{from:"^/(?:home\\.php)?(?:\\?(?!(?:.*&)?sk=h_chr(?:&|$)).*)?$",to:"/?filter=all&sk=h_chr"},{from:"^/watch(?:/(?:live|shows|topic))?/?(?:\\?(?!(?:.*&)?v=).*)?$",to:"/?filter=all&sk=h_chr"},{from:"^/reels?/?(?:\\?.*)?$",to:"/?filter=all&sk=h_chr"},{from:"^/gaming(?:/?|/(?:feed|video|browse|live)(?:/.*)?)(?:\\?.*)?$",to:"/?filter=all&sk=h_chr"}],select:[]},"www.instagram.com":{redirects:[{from:"^/(?:\\?(?!(?:.*&)?variant=(?:following|favorites)(?:&|$)).*)?$",to:"/?variant=following"},{from:"^/explore(?:/(?:people/(?:suggested/)?)?)?(?:\\?.*)?$",to:"/?variant=following"},{from:"^/reels/?(?:\\?.*)?$",to:"/?variant=following"},{from:"^/reels/([A-Za-z0-9_-]+)/?(?:\\?.*)?$",to:"/reel/$1/"},{from:"^/popular/?(?:\\?.*)?$",to:"/?variant=following"}],select:[]},"www.linkedin.com":{redirects:[{from:"^/feed/?\\?(?:.*&)?highlightedUpdateUrns=(urn(?::|%3[Aa])li(?::|%3[Aa])[A-Za-z]+(?::|%3[Aa])[0-9]+)(?:&|,|%2[Cc]|$)",to:"/feed/update/$1/"},{from:"^/feed/?(?:\\?.*)?$",to:"/notifications/"}],select:[]},"www.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ar.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"at.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"au.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"br.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ca.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ch.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"cl.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"co.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"cz.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"de.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"dk.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"es.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"fi.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"fr.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"gr.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"hu.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"id.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ie.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"in.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"it.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"jp.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"kr.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"mx.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"nl.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"no.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"nz.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ph.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"pl.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"pt.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ro.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"ru.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"se.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"sk.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"tr.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"uk.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"za.pinterest.com":{redirects:[{from:"^/ideas/?(\\?.*)?$",to:"/following/"},{from:"^/today/?(\\?.*)?$",to:"/following/"}],select:[]},"www.reddit.com":{redirects:[{from:"^/r/([Pp]opular|[Aa]ll)(/|\\?|$)",to:"/"},{from:"^/(explore|news)(/|\\?|$)",to:"/"}],select:[]},"www.threads.com":{redirects:[{from:"^/(for_you/?)?(\\?.*)?$",to:"/following"}],select:[]},"www.tiktok.com":{redirects:[{from:"^/(foryou/?)?(\\?.*)?$",to:"/following"},{from:"^/explore/?(\\?.*)?$",to:"/following"},{from:"^/live/?(\\?.*)?$",to:"/live/following"},{from:"^/shortdrama/?(\\?.*)?$",to:"/following"}],select:[]},"www.twitch.tv":{redirects:[{from:"^/(\\?.*)?$",to:"/directory/following"},{from:"^/directory/?(\\?.*)?$",to:"/directory/following"},{from:"^/directory/(all|gaming|irl|music|creative|esports)/?(\\?.*)?$",to:"/directory/following"}],select:[]},"m.twitch.tv":{redirects:[{from:"^/(\\?.*)?$",to:"/directory/following"},{from:"^/directory/?(\\?.*)?$",to:"/directory/following"},{from:"^/directory/(all|gaming|irl|music|creative|esports)/?(\\?.*)?$",to:"/directory/following"}],select:[]},"x.com":{redirects:[{from:"^/explore\\b",to:"/home"},{from:"^/i/trends\\b",to:"/home"},{from:"^/i/connect_people\\b",to:"/home"}],select:[{when:"^/home/?(\\?|$)",click:'[role="tablist"] > div:nth-child(2) > [role="tab"]',selected:'[role="tablist"] > div:not(:first-child) > [role="tab"][aria-selected="true"]'}]},"www.youtube.com":{redirects:[{from:"^/(\\?.*)?$",to:"/feed/subscriptions"},{from:"^/shorts/([A-Za-z0-9_-]+)",to:"/watch?v=$1"},{from:"^/feed/(explore|trending)\\b",to:"/feed/subscriptions"},{from:"^/gaming\\b",to:"/feed/subscriptions"}],select:[]},"m.youtube.com":{redirects:[{from:"^/(\\?.*)?$",to:"/feed/subscriptions"},{from:"^/shorts/([A-Za-z0-9_-]+)",to:"/watch?v=$1"},{from:"^/feed/(explore|trending)\\b",to:"/feed/subscriptions"},{from:"^/gaming\\b",to:"/feed/subscriptions"}],select:[]}}[location.hostname];m&&$(m,window)})();

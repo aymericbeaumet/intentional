@@ -1,0 +1,22 @@
+name: Cover a new site
+description: Propose a site whose feeds should be tamed.
+labels: [new-site]
+body:
+  - type: input
+    id: site
+    attributes:
+      label: Site
+    validations:
+      required: true
+  - type: textarea
+    id: blocked
+    attributes:
+      label: Algorithmic surfaces to remove
+      description: Feeds, recommendation rails, autoplay, swipe-to-next…
+    validations:
+      required: true
+  - type: textarea
+    id: intentional
+    attributes:
+      label: The intentional view
+      description: Where should opening the site lead? (Following, subscriptions, inbox…)

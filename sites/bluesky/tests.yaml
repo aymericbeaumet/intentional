@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://public\.api\.bsky\.app/profile/bsky\.app/feed/whats-hot$', file: post.html }
+  - { url: '^https://bsky\.app/(\?.*)?$', file: home.html }
+  - { url: '^https://bsky\.app/search', file: search.html }
+  - { url: '^https://bsky\.app/profile/[^/]+/feed/', file: feed.html }
+  - { url: '^https://bsky\.app/profile/[^/]+/post/', file: post.html }
+  - { url: '^https://bsky\.app/profile/[^/]+/?$', file: profile.html }
+
+redirects:
+  - { url: 'https://bsky.app/profile/bsky.app/feed/whats-hot', expect: 'https://bsky.app/?feed=following' }
+  - { url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/feed/whats-hot', expect: 'https://bsky.app/?feed=following' }
+  - { url: 'https://bsky.app/profile/bsky.app/feed/whats-hot?ref=share', expect: 'https://bsky.app/?feed=following' }
+  - { url: 'https://bsky.app/profile/trending.bsky.app/feed/aaaaaaaaaaaa', expect: 'https://bsky.app/?feed=following' }
+  - { url: 'https://bsky.app/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/aaaaaaaaaaaa', expect: 'https://bsky.app/?feed=following' }
+  - url: 'https://bsky.app/?feed=feedgen%7Cat%3A%2F%2Fdid%3Aplc%3Az72i7hdynmk6r22z27h6tvur%2Fapp.bsky.feed.generator%2Fwhats-hot'
+    expect: 'https://bsky.app/?feed=following'
+  - url: 'https://bsky.app/?lang=en&feed=feedgen|at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot&ref=home'
+    expect: 'https://bsky.app/?feed=following'
+  - { url: 'https://bsky.app/', expect: null }
+  - { url: 'https://bsky.app/?feed=following', expect: null }
+  - { url: 'https://bsky.app/profile/someone.test', expect: null }
+  - { url: 'https://bsky.app/profile/bsky.app', expect: null }
+  - { url: 'https://bsky.app/profile/someone.test/post/3aaaaaaaaaaaa', expect: null }
+  - { url: 'https://bsky.app/profile/someone.test/feed/whats-hot', expect: null }
+  - { url: 'https://bsky.app/profile/bsky.app/feed/whats-hotter', expect: null }
+  - { url: 'https://bsky.app/profile/bsky.app/feed/whats-hot-art', expect: null }
+  - url: 'https://bsky.app/?feed=feedgen%7Cat%3A%2F%2Fdid%3Aplc%3Afriend%2Fapp.bsky.feed.generator%2Fwhats-hot'
+    expect: null
+  - { url: 'https://bsky.app/profile/someone.test/lists/3hhhhhhhhhhhh', expect: null }
+  - { url: 'https://bsky.app/search?q=whats-hot', expect: null }
+  - { url: 'https://bsky.app/notifications', expect: null }
+
+pages:
+  - name: an unlisted Bluesky subdomain keeps its own routes
+    url: https://public.api.bsky.app/profile/bsky.app/feed/whats-hot
+    visible: ['#thread-post']
+  - name: the Discover feed and its entry points are hidden
+    url: https://bsky.app/
+    hidden: ['#discover-feed', '#tab-discover', '#sidebar-discover']
+    visible: ['#tab-following', '#tab-list', '#sidebar-following', '#sidebar-more-feeds', '#nav-home', '#nav-search']
+  - name: trending topics are hidden from the sidebar
+    url: https://bsky.app/
+    hidden: ['#trending']
+    visible: ['#desktop-feeds']
+  - name: home switches from Discover to the Following tab
+    url: https://bsky.app/
+    expectUrl: https://bsky.app/
+    visible: ['#following-feed', '#following-post']
+    hidden: ['#discover-feed']
+  - name: the Following feed opened with ?feed=following stays put
+    url: https://bsky.app/?feed=following
+    visible: ['#following-feed', '#following-post']
+    hidden: ['#discover-feed']
+  - name: a list you pinned stays selected
+    url: https://bsky.app/?feed=list%7Cat%3A%2F%2Fdid%3Aplc%3Afriend%2Fapp.bsky.graph.list%2Fgood
+    visible: ['#list-feed', '#list-post']
+  - name: the Discover feed by URL is hidden
+    url: https://bsky.app/profile/bsky.app/feed/whats-hot
+    hidden: ['#feed-screen']
+  - name: the Discover feed by URL redirects to Following
+    url: https://bsky.app/profile/bsky.app/feed/whats-hot
+    expectUrl: https://bsky.app/?feed=following
+    visible: ['#following-feed']
+  - name: the pinned Discover feed URL redirects to Following
+    url: https://bsky.app/?feed=feedgen%7Cat%3A%2F%2Fdid%3Aplc%3Az72i7hdynmk6r22z27h6tvur%2Fapp.bsky.feed.generator%2Fwhats-hot
+    expectUrl: https://bsky.app/?feed=following
+  - name: a trending topic feed is hidden
+    url: https://bsky.app/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/aaaaaaaaaaaa
+    hidden: ['#feed-screen']
+  - name: a trending topic feed redirects to Following
+    url: https://bsky.app/profile/trending.bsky.app/feed/aaaaaaaaaaaa
+    expectUrl: https://bsky.app/?feed=following
+  - name: in-app navigation to Discover lands on Following
+    url: https://bsky.app/profile/someone.test/post/3aaaaaaaaaaaa
+    steps: [{ navigate: /profile/bsky.app/feed/whats-hot }]
+    expectUrl: https://bsky.app/?feed=following
+  - name: other custom feeds opened by URL stay visible
+    url: https://bsky.app/profile/bsky.app/feed/whats-hotter
+    visible: ['#feed-screen', '#feed-post']
+  - name: Explore is hidden before a search, the search box stays
+    url: https://bsky.app/search
+    hidden: ['#search-inner', '#explore-trending']
+    visible: ['#search-input']
+  - name: search results stay visible
+    url: https://bsky.app/search?q=intentional
+    visible: ['#search-input', '#search-inner', '#search-result']
+  - name: suggested accounts are hidden from profile timelines
+    url: https://bsky.app/profile/someone.test
+    hidden: ['#suggested-follows']
+    visible: ['#profile-header', '#profile-post', '#profile-post-2']
+  - name: a post opened by URL keeps its replies
+    url: https://bsky.app/profile/someone.test/post/3aaaaaaaaaaaa
+    visible: ['#thread-post', '#thread-reply']
+
+live:
+  - name: home screen structure our rules rely on
+    url: https://bsky.app/
+    exists:
+      - '[data-testid="homeScreen"] > div > [data-testid="customFeedPage"][data-nosnippet]'
+      - '[role="tab"][data-testid^="homeScreenFeedTabs-selector-"]'
+      - '[data-testid="homeScreenFeedTabs-Discover"]'
+      - 'a[href^="/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/"]'
+    hidden: ['[data-testid="customFeedPage"][data-nosnippet]']
+  - name: home screen tabs when logged in
+    url: https://bsky.app/
+    login: true
+    exists: ['[data-testid="homeScreenFeedTabs-Following"]', '[data-testid="followingFeedPage"]']
+  - name: search screen layout
+    url: https://bsky.app/search
+    exists: ['[data-testid="searchScreen"] > div:nth-child(2) > div:first-child', '[data-testid="searchScreenInput"]']
+  - name: Discover feed by URL redirects to Following
+    url: https://bsky.app/profile/bsky.app/feed/whats-hot
+    expectUrl: https://bsky.app/?feed=following

@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://x\.com/home/?(\?|$)', file: home.html }
+  - { url: '^https://x\.com/(explore|i/trends|i/connect_people)', file: explore.html }
+  - { url: '^https://x\.com/i/lists/', file: list.html }
+  - { url: '^https://x\.com/search', file: search.html }
+  - { url: '^https://x\.com/[^/]+/status/\d+', file: status.html }
+  - { url: '^https://x\.com/[^/?]+/?(\?.*)?$', file: profile.html }
+
+redirects:
+  - { url: 'https://x.com/explore', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/explore/tabs/for-you', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/explore/tabs/trending?src=x', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/i/trends', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/i/connect_people', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/i/connect_people?user_id=1', expect: 'https://x.com/home' }
+  - { url: 'https://x.com/home', expect: null }
+  - { url: 'https://x.com/someone', expect: null }
+  - { url: 'https://x.com/someone/status/1111111111111111111', expect: null }
+  - { url: 'https://x.com/i/lists/1234567890', expect: null }
+  - { url: 'https://x.com/search?q=explore', expect: null }
+  - { url: 'https://x.com/notifications', expect: null }
+  - { url: 'https://x.com/messages', expect: null }
+  - { url: 'https://x.com/i/bookmarks', expect: null }
+  - { url: 'https://x.com/explorer', expect: null }
+  - { url: 'https://x.com/explorer/status/1111111111111111111', expect: null }
+
+pages:
+  - name: the For you timeline and its tab are hidden
+    url: https://x.com/home
+    hidden: ['#for-you-timeline', '#tab-for-you']
+    visible: ['#tab-following', '#tab-list', '#compose', '#nav-home', '#nav-notifications']
+  - name: Home switches to the Following tab, without Who to follow
+    url: https://x.com/home/
+    expectUrl: https://x.com/home/
+    visible: ['#following-timeline', '#following-tweet', '#following-tweet-2']
+    hidden: ['#for-you-timeline', '#tab-for-you', '#wtf-heading', '#wtf-user', '#wtf-more']
+  # The fixture selects the list tab for #pinned-list; ?lang=en makes this a
+  # new document load rather than a same-page fragment change.
+  - name: a list pinned to Home stays selected
+    url: https://x.com/home?lang=en#pinned-list
+    visible: ['#list-timeline', '#list-tweet', '#tab-list']
+  - name: sidebar recommendations and the Explore button are hidden
+    url: https://x.com/home
+    hidden: ['#sidebar-wtf', '#sidebar-trends', '#sidebar-news', '#nav-explore']
+    visible: ['#sidebar-search', '#nav-home']
+  - name: a post keeps its replies, drops Discover more and Relevant people
+    url: https://x.com/someone/status/1111111111111111111
+    visible: ['#focal-tweet', '#reply-composer', '#reply', '#sidebar-search']
+    hidden: ['#discover-more', '#discover-tweet-1', '#discover-tweet-2', '#relevant-people']
+  - name: Explore is hidden, its search box stays
+    url: https://x.com/explore
+    hidden: ['#explore-trends']
+    visible: ['#explore-search']
+  - name: Explore redirects to Home
+    url: https://x.com/explore/tabs/trending
+    expectUrl: https://x.com/home
+  - name: Who to follow page is hidden
+    url: https://x.com/i/connect_people
+    hidden: ['#explore-trends']
+  - name: Who to follow page redirects to Home
+    url: https://x.com/i/connect_people?user_id=1
+    expectUrl: https://x.com/home
+  - name: Trending page redirects to Home
+    url: https://x.com/i/trends
+    expectUrl: https://x.com/home
+  - name: in-app navigation to Explore lands on Home
+    url: https://x.com/someone/status/1111111111111111111
+    steps: [{ navigate: /explore }]
+    expectUrl: https://x.com/home
+  - name: profiles keep their tabs and posts, drop You might like
+    url: https://x.com/homebrew
+    visible: ['#profile-header', '#profile-tab-posts', '#profile-tab-replies', '#profile-timeline', '#profile-tweet']
+    hidden: ['#profile-wtf']
+  - name: search results stay visible
+    url: https://x.com/search?q=intentional
+    visible: ['#search-input', '#search-tab-top', '#search-tab-latest', '#search-results', '#search-tweet']
+  - name: lists stay visible
+    url: https://x.com/i/lists/1234567890
+    visible: ['#list-timeline', '#list-tweet']
+
+live:
+  - name: Home tabs our rules and tab switching rely on
+    url: https://x.com/home
+    login: true
+    exists:
+      - '[data-testid="primaryColumn"] section'
+      - '[role="tablist"] > div:first-child > [role="tab"][href="/home"][aria-selected]'
+      - '[role="tablist"] > div:nth-child(2) > [role="tab"]'
+  - name: post page structure
+    url: https://x.com/jack/status/20
+    login: true
+    exists: ['[data-testid="primaryColumn"]', '[data-testid="cellInnerDiv"]', 'article[data-testid="tweet"]']
+  - name: sidebar modules
+    url: https://x.com/home
+    login: true
+    exists: ['[data-testid="sidebarColumn"] aside[role="complementary"]', '[data-testid="sidebarColumn"] [data-testid="trend"]']
+  - name: Explore redirects to Home
+    url: https://x.com/explore
+    login: true
+    expectUrl: https://x.com/home

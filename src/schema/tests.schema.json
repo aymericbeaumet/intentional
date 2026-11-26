@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aymericbeaumet.github.io/intentional/schema/tests.schema.json",
+  "title": "intentional site tests",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixtures", "pages"],
+  "$defs": {
+    "url": { "type": "string", "pattern": "^https://" },
+    "selectors": { "type": "array", "items": { "type": "string" } }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "fixtures": {
+      "description": "Routes served by the offline test proxy: first `url` regex match wins.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "file"],
+        "properties": {
+          "url": { "type": "string" },
+          "file": { "type": "string", "pattern": "^[a-z0-9-]+\\.html$" }
+        }
+      }
+    },
+    "network": {
+      "description": "Requests checked against the uBO and AdGuard engines.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "type", "expect"],
+        "properties": {
+          "url": { "$ref": "#/$defs/url" },
+          "type": {
+            "enum": ["document", "xhr", "fetch", "script", "image", "media", "subdocument", "other"]
+          },
+          "from": { "$ref": "#/$defs/url" },
+          "expect": { "enum": ["block", "allow"] },
+          "why": { "type": "string" }
+        }
+      }
+    },
+    "redirects": {
+      "description": "URL → URL (or null: no redirect) through the redirect resolver.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "expect"],
+        "properties": {
+          "url": { "$ref": "#/$defs/url" },
+          "expect": { "anyOf": [{ "$ref": "#/$defs/url" }, { "type": "null" }] }
+        }
+      }
+    },
+    "pages": {
+      "description": "Browser checks with the real blockers on fixture pages.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "$ref": "#/$defs/url" },
+          "steps": {
+            "description": "In-app navigation (history.pushState + site events) after the first load.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["navigate"],
+              "properties": { "navigate": { "type": "string", "pattern": "^/" } }
+            }
+          },
+          "expectUrl": {
+            "description": "Where the page must end up once redirects ran.",
+            "$ref": "#/$defs/url"
+          },
+          "hidden": { "$ref": "#/$defs/selectors" },
+          "visible": { "$ref": "#/$defs/selectors" },
+          "skip": {
+            "description": "Where this case is a known limitation (documented in site.yaml): a blocker (all its legs) or one leg.",
+            "type": "array",
+            "items": { "enum": ["ublock", "adguard", "brave", "ublock-base", "adguard-base", "userscript"] }
+          }
+        }
+      }
+    },
+    "live": {
+      "description": "Checks against the real site (nightly canary).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "$ref": "#/$defs/url" },
+          "login": { "type": "boolean", "default": false },
+          "cookies": {
+            "description": "Cookies set before loading, e.g. to get past a consent wall.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "value", "domain"],
+              "properties": {
+                "name": { "type": "string" },
+                "value": { "type": "string" },
+                "domain": { "type": "string" }
+              }
+            }
+          },
+          "exists": {
+            "description": "Selectors our rules rely on: they must still exist on the live page.",
+            "$ref": "#/$defs/selectors"
+          },
+          "hidden": { "$ref": "#/$defs/selectors" },
+          "expectUrl": { "$ref": "#/$defs/url" }
+        }
+      }
+    }
+  }
+}

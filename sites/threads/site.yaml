@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: threads
+name: Threads
+domains: [threads.com, threads.net]
+hosts: [www.threads.com]
+
+intentional:
+  - label: Following
+    url: https://www.threads.com/following
+
+policy:
+  allowed:
+    - A single post opened by URL, with its replies
+    - The Following feed (chronological)
+    - Profiles, custom feeds you created, saved posts
+    - Search results
+    - Activity, messages and settings
+  blocked:
+    - The For you feed (redirects to Following)
+  limitations:
+    - Threads has no setting to open on Following, so the For you feed stays one click away in the feed menu. With redirects on, opening it sends you back to Following.
+    - Suggested accounts (on Search, in the right column and on profiles) and "Suggested for you" carousels have no stable markup to target, so they stay visible.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), the home page stays reachable but its For you feed is hidden. Bookmark the Following feed.
+    - threads.net now redirects to threads.com, where everything here applies.
+
+redirects:
+  - from: '^/(for_you/?)?(\?.*)?$'
+    to: /following

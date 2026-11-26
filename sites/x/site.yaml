@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: x
+name: X
+domains: [x.com, twitter.com]
+hosts: [x.com]
+
+intentional:
+  - label: Home (Following)
+    url: https://x.com/home
+
+policy:
+  allowed:
+    - A single post opened by URL, with its replies
+    - The Following timeline, and lists or communities you pinned to Home
+    - Lists, communities, bookmarks and profiles
+    - Search results
+    - Notifications, messages and settings
+  blocked:
+    - The For you timeline and its tab (Home switches to Following)
+    - Explore, Trending and Who to follow pages (redirect to Home)
+    - The "Discover more" posts under a post
+    - Who to follow and Relevant people in the sidebar, Who to follow modules in timelines and on profiles
+    - Trending and Today's News in the sidebar, the Explore button
+  limitations:
+    - Following has no URL of its own, and since December 2025 X reopens For you on every load. With redirects on, the list clicks Following for you; without them, the For you timeline is hidden until you pick Following.
+    - On narrow screens X puts search inside Explore, which redirects to Home. Search from the sidebar box on wider screens, or open x.com/search?q=… directly.
+    - Ads in the Following timeline stay; this list removes recommendations, not ads.
+
+redirects:
+  - from: '^/explore\b'
+    to: /home
+  - from: '^/i/trends\b'
+    to: /home
+  - from: '^/i/connect_people\b'
+    to: /home
+
+select:
+  - when: '^/home/?(\?|$)'
+    click: '[role="tablist"] > div:nth-child(2) > [role="tab"]'
+    selected: '[role="tablist"] > div:not(:first-child) > [role="tab"][aria-selected="true"]'

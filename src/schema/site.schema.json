@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aymericbeaumet.github.io/intentional/schema/site.schema.json",
+  "title": "intentional site definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "domains", "hosts", "intentional", "policy"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "description": "Folder name and list file name.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "domains": {
+      "description": "Registrable domains this site owns. Every rule must target one of these or a subdomain.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]+$" }
+    },
+    "hosts": {
+      "description": "Hostnames where pages are served; redirects and the userscript run here.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]+$" }
+    },
+    "intentional": {
+      "description": "The intentional views: what to bookmark or add to the home screen.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "url"],
+        "properties": {
+          "label": { "type": "string" },
+          "url": { "type": "string", "pattern": "^https://" }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "blocked"],
+      "properties": {
+        "allowed": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "blocked": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "redirects": {
+      "description": "Algorithmic surfaces and where they lead instead. `from` is a regex on pathname+search.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to"],
+        "properties": {
+          "from": { "type": "string", "pattern": "^\\^" },
+          "to": { "type": "string", "pattern": "^/" },
+          "hosts": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "select": {
+      "description": "Tabs to switch to when a page has no dedicated URL for its intentional view.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["when", "click", "selected"],
+        "properties": {
+          "when": { "type": "string", "pattern": "^\\^" },
+          "click": { "type": "string", "description": "CSS selector of the tab to click." },
+          "selected": {
+            "type": "string",
+            "description": "CSS selector that matches once the intentional tab is active."
+          },
+          "hosts": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

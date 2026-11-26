@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: linkedin
+name: LinkedIn
+domains: [linkedin.com]
+hosts: [www.linkedin.com]
+
+intentional:
+  - label: Notifications
+    url: https://www.linkedin.com/notifications/
+
+policy:
+  allowed:
+    - A single post opened by URL (/feed/update/…, /posts/…), with its comments
+    - Profiles, company pages, articles and newsletters opened by URL
+    - Notifications and messaging
+    - My Network itself (invitations, connections, people you follow)
+    - Search and jobs
+  blocked:
+    - The home feed (redirects to Notifications)
+    - The Home nav item, which only leads to the feed
+    - The feed page's side rails, LinkedIn News and "Add to your feed"
+    - '"People you may know" and other suggestion cards on My Network, "People you may know" next to profiles'
+    - Promoted items and ads in the side rails, and further pages of the feed
+  limitations:
+    - >-
+      LinkedIn has no following-only feed anywhere. Notifications is the most intentional page
+      left, so the feed redirects there.
+    - >-
+      The feed's "Most recent" sort is regional and doesn't stick, so the list doesn't rely on it.
+    - >-
+      Feed links that highlight a post (/feed/?highlightedUpdateUrns=…) redirect to that single post.
+      Without redirects (Brave, uBO Lite, AdGuard without Trusted), the feed page stays reachable
+      with its posts and side rails hidden, except on those links, where the feed stays visible so
+      the linked post does too.
+    - >-
+      LinkedIn's new interface hashes its class names. News, "Add to your feed", "People you may
+      know" and the suggestion cards are found by their English heading or button label ("Invite …
+      to connect", "Follow …"), so they only hide when LinkedIn is in English.
+
+redirects:
+  # Open the first post in a highlighted list before handling the feed root.
+  - from: '^/feed/?\?(?:.*&)?highlightedUpdateUrns=(urn(?::|%3[Aa])li(?::|%3[Aa])[A-Za-z]+(?::|%3[Aa])[0-9]+)(?:&|,|%2[Cc]|$)'
+    to: /feed/update/$1/
+  - from: '^/feed/?(?:\?.*)?$'
+    to: /notifications/

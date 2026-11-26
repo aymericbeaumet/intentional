@@ -1,0 +1,24 @@
+name: Install test browsers
+description: Restore pinned browsers and allow Chrome's sandbox on Ubuntu runners.
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: .cache
+        key: browsers-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'tests/browser/ublock.json') }}
+    - run: npm run browsers
+      shell: bash
+    - name: Allow Chrome for Testing to create its sandbox
+      shell: bash
+      run: |
+        if [[ $(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null) == 1 ]]; then
+          chrome=$(node --input-type=module -e 'import { installedExecutable } from "./tests/browser/harness/browsers.ts"; console.log(await installedExecutable("chrome"))')
+          sudo apparmor_parser --replace <<PROFILE
+        abi <abi/4.0>,
+        include <tunables/global>
+        profile intentional-chrome "$chrome" flags=(unconfined) {
+          userns,
+        }
+        PROFILE
+        fi

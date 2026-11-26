@@ -1,0 +1,29 @@
+! X: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Home: the For you timeline ---
+! The first Home tab links to /home. Native CSS releases the timeline as soon as
+! X changes aria-selected, including when switching tabs without re-rendering.
+x.com##main:has([role="tablist"] > div:first-child > [role="tab"][href="/home"][aria-selected="true"]) [data-testid="primaryColumn"] section
+x.com##[role="tablist"] > div:first-child:has(> [role="tab"][href="/home"])
+
+! --- Who to follow modules in timelines ---
+! A heading cell right before account cells, the account cells, the "Show more" cell.
+x.com##:matches-path(/^\/home\/?(\?|$)/) [data-testid="cellInnerDiv"]:has(h2):has(+ [data-testid="cellInnerDiv"] [data-testid="UserCell"])
+x.com##:matches-path(/^\/home\/?(\?|$)/) [data-testid="cellInnerDiv"]:has([data-testid="UserCell"])
+x.com##[data-testid="cellInnerDiv"]:has(a[href^="/i/connect_people"])
+
+! --- Post page: "Discover more" and every post after it ---
+! Its heading is the only one followed by a description line (div[dir]).
+x.com##:matches-path(/\/status\/\d+/) [data-testid="cellInnerDiv"]:has(h2[role="heading"] + div[dir])
+x.com##:matches-path(/\/status\/\d+/) [data-testid="cellInnerDiv"]:has(h2[role="heading"] + div[dir]) ~ [data-testid="cellInnerDiv"]
+
+! --- Sidebar: Who to follow, Relevant people, Trending, Today's News ---
+x.com##[data-testid="sidebarColumn"] aside[role="complementary"]:has([data-testid="UserCell"])
+x.com##[data-testid="sidebarColumn"] section:has([data-testid="trend"])
+x.com##[data-testid="sidebarColumn"] div:has(> [data-testid="news_sidebar"])
+! "You might like" on a profile, after following it.
+x.com##[data-testid="primaryColumn"] aside[role="complementary"]:has(a[href^="/i/connect_people"])
+
+! --- Explore, Trending, Who to follow pages (redirected when redirects are on) ---
+x.com##nav a[href="/explore"]
+x.com##:matches-path(/^\/(explore|i\/trends|i\/connect_people)\b/) [data-testid="primaryColumn"] section

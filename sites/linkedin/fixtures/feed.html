@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Feed | LinkedIn</title></head>
+<body>
+<header>
+  <nav data-testid="primary-nav" aria-label="Primary">
+    <ul>
+      <li id="nav-home"><button aria-label="Home">Home</button></li>
+      <li id="nav-network"><a href="https://www.linkedin.com/mynetwork/">My Network</a></li>
+      <li id="nav-notifications"><a href="https://www.linkedin.com/notifications/">Notifications</a></li>
+    </ul>
+  </nav>
+</header>
+<div>
+  <aside id="left-rail" aria-label="Profile summary">Your profile</aside>
+  <main id="main" aria-label="Main Feed">
+    <div data-testid="mainFeed">
+      <div id="feed-post" role="listitem" componentkey="update-card-focus-urn:li:activity:7000000000000000001"><p>A post from someone you follow</p></div>
+      <div role="listitem" componentkey="update-card-focus-urn:li:activity:7000000000000000002"><p>Suggested</p></div>
+    </div>
+  </main>
+  <aside id="right-rail" aria-label="Sidebar">
+    <div componentkey="right-rail">
+      <div id="news-module" componentkey="news-module"><p>LinkedIn News</p><ul><li>Top story</li></ul></div>
+      <div id="follows-module" componentkey="follow-recommendations"><p>Add to your feed</p><ul><li>A page to follow</li></ul></div>
+      <div id="games-module"><p>Today’s puzzles</p></div>
+      <div id="rail-ad"><iframe title="advertisement" src="about:blank"></iframe></div>
+      <!-- Older layout -->
+      <section id="feed-news-module" class="news-module" data-view-name="feed-news-module"><h2>LinkedIn News</h2></section>
+      <section id="classic-follows-module" class="feed-follows-module"><h2>Add to your feed</h2></section>
+    </div>
+  </aside>
+</div>
+</body></html>

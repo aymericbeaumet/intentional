@@ -1,0 +1,22 @@
+! Bluesky: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- Discover feed on the home screen ---
+! Bluesky marks the Discover feed page with data-nosnippet, in every language.
+bsky.app##[data-testid="customFeedPage"][data-nosnippet]
+! Tab labels are localized: this one only matches the English UI.
+bsky.app##[role="tab"]:has([data-testid="homeScreenFeedTabs-Discover"])
+! Discover in the desktop sidebar's list of pinned feeds.
+bsky.app##[role="link"][aria-label="Discover"]
+! The Discover feed opened by URL (redirected when redirects are on).
+bsky.app##:matches-path(/^\/profile\/(bsky\.app|did:plc:z72i7hdynmk6r22z27h6tvur)\/feed\/whats-hot\/?(\?|$)/) [data-testid="customFeedScreen"]
+
+! --- Trending topics (sidebar and Explore) ---
+! Every trending topic links to a feed of the trending.bsky.app account.
+bsky.app##div:has(> div > a[href^="/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/"])
+bsky.app##:matches-path(/^\/profile\/(trending\.bsky\.app|did:plc:qrz3lhbyuxbeilrc6nekdqme)\/feed\//) [data-testid="customFeedScreen"]
+
+! --- Explore: what Search shows before you type a query ---
+bsky.app##:matches-path(/^\/search\/?$/) [data-testid="searchScreen"] > div:nth-child(2) > div:first-child
+
+! --- Suggested accounts injected into timelines ---
+bsky.app##div:has(> div > div > [aria-label="See more suggested profiles"])

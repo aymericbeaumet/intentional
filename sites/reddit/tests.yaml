@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.reddit\.com/(\?.*)?$', file: home.html }
+  - { url: '^https://www\.reddit\.com/r/[Pp]opular(/|\?|$)', file: popular.html }
+  - { url: '^https://www\.reddit\.com/r/[Aa]ll(/|\?|$)', file: all.html }
+  - { url: '^https://www\.reddit\.com/explore(/|\?|$)', file: explore.html }
+  - { url: '^https://www\.reddit\.com/news(/|\?|$)', file: news.html }
+  - { url: '^https://www\.reddit\.com/r/[^/]+/comments/', file: post.html }
+  - { url: '^https://www\.reddit\.com/r/[^/]+/?(\?.*)?$', file: subreddit.html }
+  - { url: '^https://www\.reddit\.com/user/', file: user.html }
+  - { url: '^https://old\.reddit\.com/', file: old-home.html }
+
+network:
+  - url: https://www.reddit.com/svc/shreddit/search-typeahead?query=&cId=00000000-0000-0000-0000-000000000000&mode=search
+    from: https://www.reddit.com/
+    type: fetch
+    expect: block
+    why: an empty query loads trending searches and trending communities
+  - url: https://www.reddit.com/svc/shreddit/search-typeahead?query=intentional&cId=00000000-0000-0000-0000-000000000000&mode=search
+    from: https://www.reddit.com/
+    type: fetch
+    expect: allow
+    why: suggestions for what you typed
+  - url: https://www.reddit.com/svc/shreddit/feeds/interest-home-feed?feed=for-you&after=dDNfYWFhYWFh
+    from: https://www.reddit.com/
+    type: fetch
+    expect: allow
+    why: the next page of Home
+  - url: https://www.reddit.com/r/programming/comments/aaaaaa/post/
+    type: document
+    expect: allow
+  - url: https://www.reddit.com/search/?q=intentional
+    type: document
+    expect: allow
+
+redirects:
+  - { url: 'https://www.reddit.com/r/popular/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/popular', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/popular/top/?t=day', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/popular?geo_filter=FR', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/Popular/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/all/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/r/all/new/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/explore/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/explore/gaming/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/news/', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/news?utm_source=share', expect: 'https://www.reddit.com/' }
+  - { url: 'https://www.reddit.com/', expect: null }
+  - { url: 'https://www.reddit.com/?feed=home', expect: null }
+  - { url: 'https://www.reddit.com/r/programming/', expect: null }
+  - { url: 'https://www.reddit.com/r/programming/comments/aaaaaa/post/', expect: null }
+  - { url: 'https://www.reddit.com/r/popularmmos/', expect: null }
+  - { url: 'https://www.reddit.com/r/allthingsdnd/', expect: null }
+  - { url: 'https://www.reddit.com/r/news/', expect: null }
+  - { url: 'https://www.reddit.com/r/explore/', expect: null }
+  - { url: 'https://www.reddit.com/newsletters', expect: null }
+  - { url: 'https://www.reddit.com/user/someone/', expect: null }
+  - { url: 'https://www.reddit.com/user/someone/m/myfeed/', expect: null }
+  - { url: 'https://www.reddit.com/search/?q=popular', expect: null }
+  - { url: 'https://www.reddit.com/notifications', expect: null }
+  - { url: 'https://www.reddit.com/chat', expect: null }
+  - { url: 'https://old.reddit.com/', expect: null }
+  - { url: 'https://old.reddit.com/r/popular/', expect: null }
+  - { url: 'https://old.reddit.com/r/all/', expect: null }
+
+pages:
+  - name: home keeps joined communities and drops suggested posts and communities
+    url: https://www.reddit.com/
+    visible: ['#post-joined', '#search', '#nav-community', '#recent-posts', '#link-policy']
+    hidden:
+      - '#post-recommended'
+      - '#post-unjoined'
+      - '#in-feed-communities'
+      - '#popular-communities'
+      - '#link-popular'
+      - '#link-news'
+      - '#link-explore'
+  # A scriptlet (remove-attr): AdGuard runs it only from a Trusted list (see site.yaml limitations).
+  - name: the left menu keeps Home and drops Popular and Explore
+    url: https://www.reddit.com/?feed=home
+    visible: ['#nav-home']
+    hidden: ['#nav-popular', '#nav-explore']
+    skip: [adguard-base]
+  - name: a community keeps its posts and its Join button, drops recommendations
+    url: https://www.reddit.com/r/programming/
+    visible: ['#sub-header', '#sub-join', '#sub-post']
+    hidden: ['#sub-recommended', '#sub-in-feed-communities']
+  - name: a post opened by URL keeps the post and comments, drops related posts
+    url: https://www.reddit.com/r/elsewhere/comments/gggggg/post/
+    visible: ['#post-title', '#post-join', '#post-video', '#comments', '#community-info']
+    hidden: ['#related-posts', '#answers-suggested-queries-pdp', '#video-recommendations']
+  - name: a profile keeps posts from communities you haven't joined
+    url: https://www.reddit.com/user/someone/
+    visible: ['#profile-post']
+  - name: r/popular is hidden
+    url: https://www.reddit.com/r/popular/
+    hidden: ['#main-content']
+    visible: ['#logo']
+  - name: r/popular redirects to Home
+    url: https://www.reddit.com/r/popular/top/?t=day
+    expectUrl: https://www.reddit.com/
+    visible: ['#post-joined']
+  # The runtime stops after 3 redirects in 10 seconds per tab, and the browser legs reuse one
+  # tab, so this file keeps 3 redirect page cases; `redirects` above covers every URL.
+  - name: r/all is hidden
+    url: https://www.reddit.com/r/all/
+    hidden: ['#main-content']
+  - name: Explore is hidden
+    url: https://www.reddit.com/explore/
+    hidden: ['#main-content']
+  - name: Explore redirects to Home
+    url: https://www.reddit.com/explore/
+    expectUrl: https://www.reddit.com/
+  - name: News is hidden
+    url: https://www.reddit.com/news/
+    hidden: ['#main-content']
+  - name: in-app navigation to r/popular lands on Home
+    url: https://www.reddit.com/r/elsewhere/comments/gggggg/post/
+    steps: [{ navigate: /r/popular/ }]
+    expectUrl: https://www.reddit.com/
+  - name: old Reddit keeps its front page and drops Popular and All
+    url: https://old.reddit.com/
+    visible: ['#old-front', '#old-users', '#old-sub', '#siteTable']
+    hidden: ['#old-popular', '#old-all']
+  - name: old Reddit is never redirected
+    url: https://old.reddit.com/r/popular/
+    visible: ['#siteTable']
+
+live:
+  - name: post page structure our rules rely on
+    url: https://www.reddit.com/r/programming/comments/1y0aow0/postgresql_19_released/
+    exists:
+      - 'shreddit-app[pagetype="post_detail"]'
+      - 'shreddit-post'
+      - 'aside > pdp-right-rail'
+      - '#answers-suggested-queries-pdp'
+    hidden: ['aside:has(> pdp-right-rail)', '#answers-suggested-queries-pdp']
+  - name: r/popular page and its feed (also the logged-out front page)
+    url: https://www.reddit.com/r/popular/
+    exists:
+      - 'shreddit-app[pagetype="popular"] #main-content'
+      - 'shreddit-feed[reload-url] > article > shreddit-post[recommendation-source]'
+      - 'faceplate-tracker[noun="popular_menu"]'
+      - 'aside.right-rail-popular-communities'
+  - name: Explore page and its community recommendations
+    url: https://www.reddit.com/explore/
+    exists: ['shreddit-app[pagetype="explore"] #main-content', 'in-feed-community-recommendations']
+  - name: News page
+    url: https://www.reddit.com/news/
+    exists: ['shreddit-app[pagetype="news"] #main-content']
+  - name: community page feed
+    url: https://www.reddit.com/r/programming/
+    exists: ['shreddit-app[pagetype="community"]', 'shreddit-feed[reload-url*="community-more-posts"] > article > shreddit-post']
+  - name: Home suggestions and the left menu (logged in)
+    url: https://www.reddit.com/
+    login: true
+    exists:
+      - 'shreddit-app[pagetype="home"][user-logged-in="true"]'
+      - 'shreddit-feed[reload-url*="home-feed"] > article > shreddit-post'
+      - 'left-nav-top-section[popular]'

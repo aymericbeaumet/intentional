@@ -1,0 +1,7 @@
+! Threads: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- For you feed ---
+! Each column has a header whose title links to the column's own page, then a
+! sibling holding the column body (role="region"). Hide the body of the column
+! titled /for_you, wherever it is shown (home page, or pinned next to others).
+www.threads.com##div:has(a[href="/for_you"][aria-label]) + div:has(> [role="region"])

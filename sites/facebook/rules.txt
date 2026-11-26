@@ -1,0 +1,29 @@
+! Facebook: see site.yaml for the policy and tests.yaml for what each rule must do.
+! Class names are generated and change constantly: rules anchor on href, role, aria-posinset and data-* attributes.
+
+! --- Algorithmic home feed, when redirects are off ---
+! The path regex reads the query: Feeds (?sk=h_chr, any filter) keeps its posts.
+www.facebook.com##:matches-path(/^\/(?:home\.php)?(?:\?(?!(?:.*&)?sk=h_chr(?:&|$)).*)?$/) div[role="main"] div[aria-posinset]
+
+! --- Growth injections in feeds: People you may know, suggested groups ---
+www.facebook.com##div[aria-posinset]:has(a:is([href="/friends/"],[href^="/friends/suggestions"],[href="https://www.facebook.com/friends/"],[href^="https://www.facebook.com/friends/suggestions"]))
+www.facebook.com##div[aria-posinset]:has(a:is([href^="/groups/discover"],[href^="https://www.facebook.com/groups/discover"]))
+
+! --- Suggested posts (English label) ---
+www.facebook.com##div[aria-posinset]:has(span:has-text(/^Suggested for you$/))
+
+! --- Reels carousels: "Reels and short videos" in feeds, "Related Reels" under videos ---
+www.facebook.com##div[aria-posinset]:has(div[data-type="hscroll-child"] a[href*="/reel/"])
+www.facebook.com##div:has(> div > div[role="region"] div[data-type="hscroll-child"] a[href*="/reel/"])
+
+! --- Reel player: the opened reel plays, without its previous/next card buttons ---
+www.facebook.com##div:has(> div [data-pagelet="Reels"]) > div[role="button"]
+
+! --- Entry points: Video home and its Live, Shows and Explore tabs (a video link keeps working) ---
+www.facebook.com##a:is([href="/watch/"],[href^="/watch/?"],[href^="/watch/live/"],[href^="/watch/shows/"],[href^="/watch/topic/"],[href="https://www.facebook.com/watch/"],[href^="https://www.facebook.com/watch/?"]):not([href*="?v="],[href*="&v="])
+
+! --- Entry points: the Reels tab (a reel link keeps working) ---
+www.facebook.com##a:is([href="/reel/"],[href^="/reel/?"],[href="https://www.facebook.com/reel/"],[href^="https://www.facebook.com/reel/?"])
+
+! --- Entry points: Gaming home and its video feeds (a streamer's page stays) ---
+www.facebook.com##a:is([href="/gaming/"],[href^="/gaming/?"],[href^="/gaming/feed/"],[href^="/gaming/video/"],[href="https://www.facebook.com/gaming/"],[href^="https://www.facebook.com/gaming/?"],[href^="https://www.facebook.com/gaming/feed/"],[href^="https://www.facebook.com/gaming/video/"])

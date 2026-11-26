@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.threads\.com/(for_you/?)?(\?.*)?$', file: for-you.html }
+  - { url: '^https://www\.threads\.com/following', file: following.html }
+  - { url: '^https://www\.threads\.com/@[^/]+/post/', file: post.html }
+  - { url: '^https://www\.threads\.com/@[^/]+/?$', file: profile.html }
+  - { url: '^https://www\.threads\.com/search', file: search.html }
+
+redirects:
+  - { url: 'https://www.threads.com/', expect: 'https://www.threads.com/following' }
+  - { url: 'https://www.threads.com/?xmt=AQGz', expect: 'https://www.threads.com/following' }
+  - { url: 'https://www.threads.com/for_you', expect: 'https://www.threads.com/following' }
+  - { url: 'https://www.threads.com/for_you/', expect: 'https://www.threads.com/following' }
+  - { url: 'https://www.threads.com/following', expect: null }
+  - { url: 'https://www.threads.com/following?xmt=AQGz', expect: null }
+  - { url: 'https://www.threads.com/@someone', expect: null }
+  - { url: 'https://www.threads.com/@someone/post/AAAAAAAAAAA', expect: null }
+  - { url: 'https://www.threads.com/search?q=intentional', expect: null }
+  - { url: 'https://www.threads.com/activity', expect: null }
+  - { url: 'https://www.threads.com/for_youth', expect: null }
+
+pages:
+  - name: the For you feed is hidden
+    url: https://www.threads.com/
+    hidden: ['#for-you-body']
+    visible: ['#nav-home', '#nav-search', '#nav-activity', '#column-title', '#pinned-following-body']
+  - name: home redirects to Following
+    url: https://www.threads.com/
+    expectUrl: https://www.threads.com/following
+    visible: ['#following-body', '#following-post']
+  - name: the For you URL is hidden
+    url: https://www.threads.com/for_you
+    hidden: ['#for-you-body']
+  - name: the For you URL redirects to Following
+    url: https://www.threads.com/for_you
+    expectUrl: https://www.threads.com/following
+  - name: Following keeps its feed, a pinned For you column is hidden
+    url: https://www.threads.com/following
+    visible: ['#following-title', '#following-body', '#following-post', '#pinned-for-you-title']
+    hidden: ['#pinned-for-you-body']
+  - name: in-app navigation to home lands on Following
+    url: https://www.threads.com/@someone
+    steps: [{ navigate: / }]
+    expectUrl: https://www.threads.com/following
+  - name: a post opened by URL keeps its replies
+    url: https://www.threads.com/@someone/post/DDDDDDDDDDD
+    visible: ['#post-body', '#post', '#reply']
+  - name: profiles stay visible
+    url: https://www.threads.com/@someone
+    visible: ['#profile-body', '#profile-post', '#profile-tab-threads', '#profile-tab-replies']
+  - name: search stays visible
+    url: https://www.threads.com/search?q=intentional
+    visible: ['#search-body', '#search-input', '#search-result']
+
+live:
+  - name: column layout our rules rely on (logged out profile)
+    url: https://www.threads.com/@zuck
+    exists:
+      - '#barcelona-page-layout'
+      - 'div:has(a[href="/@zuck"][aria-label]) + div:has(> [role="region"])'
+  - name: Following column structure when logged in
+    url: https://www.threads.com/following
+    login: true
+    exists: ['a[href="/following"][aria-label]', '[role="region"]']
+  - name: home redirects to Following
+    url: https://www.threads.com/
+    login: true
+    expectUrl: https://www.threads.com/following

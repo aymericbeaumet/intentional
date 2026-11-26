@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>r/programming</title></head>
+<body>
+<shreddit-app pagetype="community" routename="subreddit" user-logged-in="true">
+  <reddit-header-large><a id="logo" href="/">Reddit</a></reddit-header-large>
+  <div id="subgrid-container">
+    <main id="main-content">
+      <section id="sub-header"><h1>r/programming</h1><shreddit-join-button id="sub-join" name="programming">Join</shreddit-join-button></section>
+      <shreddit-feed reload-url="/svc/shreddit/community-more-posts/hot/?name=programming">
+        <article id="sub-post"><shreddit-post subreddit-name="programming" permalink="/r/programming/comments/eeeeee/post/"><a slot="full-post-link" href="/r/programming/comments/eeeeee/post/">Post in this community</a></shreddit-post></article>
+        <hr>
+        <article id="sub-recommended"><shreddit-post subreddit-name="elsewhere" recommendation-source="similar_subreddit" permalink="/r/elsewhere/comments/ffffff/post/"><a slot="full-post-link" href="/r/elsewhere/comments/ffffff/post/">Recommended post from elsewhere</a></shreddit-post></article>
+        <in-feed-community-recommendations id="sub-in-feed-communities">Related communities</in-feed-community-recommendations>
+      </shreddit-feed>
+    </main>
+  </div>
+</shreddit-app>
+</body></html>

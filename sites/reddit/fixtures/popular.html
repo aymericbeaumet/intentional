@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>r/popular</title></head>
+<body>
+<shreddit-app pagetype="popular" routename="popular" user-logged-in="true">
+  <reddit-header-large><a id="logo" href="/">Reddit</a></reddit-header-large>
+  <div id="subgrid-container">
+    <main id="main-content">
+      <shreddit-feed reload-url="/svc/shreddit/feeds/popular-feed?sort=BEST">
+        <article id="popular-post"><shreddit-post recommendation-source="global_good_visits" subreddit-name="elsewhere"><a slot="full-post-link" href="/r/elsewhere/comments/dddddd/post/">Popular post</a></shreddit-post></article>
+      </shreddit-feed>
+    </main>
+  </div>
+</shreddit-app>
+</body></html>

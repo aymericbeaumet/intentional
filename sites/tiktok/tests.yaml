@@ -1,0 +1,191 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.tiktok\.com/(foryou/?)?(\?.*)?$', file: foryou.html }
+  - { url: '^https://www\.tiktok\.com/explore', file: explore.html }
+  - { url: '^https://www\.tiktok\.com/following', file: following.html }
+  - { url: '^https://www\.tiktok\.com/@[^/]+/(video|photo)/', file: video.html }
+  - { url: '^https://www\.tiktok\.com/@[^/?]+/?(\?.*)?$', file: profile.html }
+  - { url: '^https://www\.tiktok\.com/live', file: live.html }
+  - { url: '^https://www\.tiktok\.com/shortdrama', file: shortdrama.html }
+  - { url: '^https://www\.tiktok\.com/search', file: search.html }
+
+network:
+  - url: https://www.tiktok.com/api/recommend/item_list/?aid=1988&count=6
+    from: https://www.tiktok.com/
+    type: fetch
+    expect: block
+    why: the For You feed
+  - url: https://www.tiktok.com/api/prefetch/recommend/item_list/?aid=1988
+    from: https://www.tiktok.com/following
+    type: fetch
+    expect: block
+    why: For You, prefetched from other pages
+  - url: https://www.tiktok.com/api/explore/item_list/?aid=1988&categoryType=120
+    from: https://www.tiktok.com/explore
+    type: fetch
+    expect: block
+    why: the Explore grid
+  - url: https://www.tiktok.com/api/prefetch/explore/item_list/?aid=1988
+    from: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: fetch
+    expect: block
+    why: Explore, prefetched from every page
+  - url: https://www.tiktok.com/api/related/item_list/?aid=1988&itemID=7000000000000000001
+    from: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: fetch
+    expect: block
+    why: the videos queued after the opened one
+  - url: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: document
+    expect: allow
+    why: a video opened by URL
+  - url: https://www.tiktok.com/@someone/photo/7000000000000000004
+    type: document
+    expect: allow
+    why: a photo post opened by URL
+  - url: https://vm.tiktok.com/ZMabcdefg/
+    type: document
+    expect: allow
+    why: share links resolve to the video
+  - url: https://www.tiktok.com/api/item/detail/?aid=1988&itemId=7000000000000000001
+    from: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: fetch
+    expect: allow
+    why: the opened video's own data (in-app navigation)
+  - url: https://www.tiktok.com/api/comment/list/?aid=1988&aweme_id=7000000000000000001
+    from: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: fetch
+    expect: allow
+    why: comments under the opened video
+  - url: https://v16-webapp-prime.tiktok.com/video/tos/useast2a/tos-useast2a-pve-0068/abc/?mime_type=video_mp4
+    from: https://www.tiktok.com/@someone/video/7000000000000000001
+    type: media
+    expect: allow
+    why: the video stream itself
+  - url: https://www.tiktok.com/api/following/item_list/?aid=1988
+    from: https://www.tiktok.com/following
+    type: fetch
+    expect: allow
+    why: the Following feed
+  - url: https://www.tiktok.com/api/post/item_list/?aid=1988&secUid=x
+    from: https://www.tiktok.com/@someone
+    type: fetch
+    expect: allow
+    why: a profile's videos
+  - url: https://www.tiktok.com/api/search/general/full/?aid=1988&keyword=cats
+    from: https://www.tiktok.com/search?q=cats
+    type: fetch
+    expect: allow
+    why: search results
+
+redirects:
+  - { url: 'https://www.tiktok.com/', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/?lang=en', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/foryou', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/foryou?lang=en', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/explore', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/explore?lang=en', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/live', expect: 'https://www.tiktok.com/live/following' }
+  - { url: 'https://www.tiktok.com/live?enter_from_merge=web', expect: 'https://www.tiktok.com/live/following' }
+  - { url: 'https://www.tiktok.com/shortdrama', expect: 'https://www.tiktok.com/following' }
+  - { url: 'https://www.tiktok.com/following', expect: null }
+  - { url: 'https://www.tiktok.com/friends', expect: null }
+  - { url: 'https://www.tiktok.com/live/following', expect: null }
+  - { url: 'https://www.tiktok.com/live/gaming/Minecraft', expect: null }
+  - { url: 'https://www.tiktok.com/@someone/live', expect: null }
+  - { url: 'https://www.tiktok.com/@someone', expect: null }
+  - { url: 'https://www.tiktok.com/@someone/video/7000000000000000001', expect: null }
+  - { url: 'https://www.tiktok.com/@someone/video/7000000000000000001?is_from_webapp=1', expect: null }
+  - { url: 'https://www.tiktok.com/@someone/photo/7000000000000000004', expect: null }
+  - { url: 'https://www.tiktok.com/search?q=foryou', expect: null }
+  - { url: 'https://www.tiktok.com/tag/foryou', expect: null }
+  - { url: 'https://www.tiktok.com/explorer', expect: null }
+  - { url: 'https://www.tiktok.com/messages', expect: null }
+
+pages:
+  - name: For You and its navigation entries are hidden
+    url: https://www.tiktok.com/
+    hidden: ['#main-content-homepage_hot', '#nav-foryou', '#nav-explore', '#nav-live', '#nav-short-drama']
+    visible: ['#logo', '#search', '#nav-following', '#nav-profile']
+  - name: For You redirects to Following
+    url: https://www.tiktok.com/
+    expectUrl: https://www.tiktok.com/following
+    visible: ['#following-item']
+  - name: the /foryou alias redirects to Following
+    url: https://www.tiktok.com/foryou?lang=en
+    expectUrl: https://www.tiktok.com/following
+  - name: Explore is hidden
+    url: https://www.tiktok.com/explore
+    hidden: ['#main-content-explore_page']
+    visible: ['#nav-following']
+  - name: Explore redirects to Following
+    url: https://www.tiktok.com/explore
+    expectUrl: https://www.tiktok.com/following
+  - name: Following keeps followed videos and drops suggested accounts
+    url: https://www.tiktok.com/following
+    visible: ['#main-content-homepage_follow', '#following-item', '#nav-following']
+    hidden: ['#suggested-card']
+  - name: a video opened by URL plays with its comments, nothing queued after it
+    url: https://www.tiktok.com/@someone/video/7000000000000000001
+    visible: ['#opened-video', '#video-desc', '#tab-comments', '#comments']
+    hidden: ['#one-column-item-1', '#nav-prev', '#nav-next', '#tab-you-may-like']
+  - name: a photo post opened by URL is shown alone
+    url: https://www.tiktok.com/@someone/photo/7000000000000000004
+    visible: ['#opened-video', '#comments']
+    hidden: ['#one-column-item-1', '#nav-next']
+  - name: profiles keep their videos and drop suggested accounts
+    url: https://www.tiktok.com/@someone
+    visible: ['#user-title', '#profile-follow', '#videos-tab', '#post-item']
+    hidden: ['#suggested-toggle', '#suggested-panel']
+  - name: the For You LIVE feed is hidden
+    url: https://www.tiktok.com/live
+    hidden: ['#live-card', '#live-category-card', '#tab-live-foryou', '#nav-discover-live']
+    visible: ['#tab-live-following']
+  - name: the LIVE hub redirects to Following LIVE
+    url: https://www.tiktok.com/live
+    expectUrl: https://www.tiktok.com/live/following
+    visible: ['#live-card', '#tab-live-following']
+  - name: Following LIVE keeps the streams of followed accounts
+    url: https://www.tiktok.com/live/following
+    visible: ['#live-card', '#live-category-card', '#tab-live-following', '#tab-live-gaming']
+    hidden: ['#tab-live-foryou', '#nav-discover-live']
+  - name: the Short dramas hub is hidden
+    url: https://www.tiktok.com/shortdrama
+    hidden: ['#drama-library']
+  - name: the Short dramas hub redirects to Following
+    url: https://www.tiktok.com/shortdrama
+    expectUrl: https://www.tiktok.com/following
+  - name: search results stay
+    url: https://www.tiktok.com/search?q=cats
+    visible: ['#search-input', '#search-result']
+  - name: in-app navigation to For You lands on Following
+    url: https://www.tiktok.com/@someone/video/7000000000000000001
+    steps: [{ navigate: / }]
+    expectUrl: https://www.tiktok.com/following
+  - name: in-app navigation to Explore lands on Following
+    url: https://www.tiktok.com/@someone
+    steps: [{ navigate: /explore }]
+    expectUrl: https://www.tiktok.com/following
+
+live:
+  - name: video page structure our rules rely on
+    url: https://www.tiktok.com/@tiktok/video/7106594312292453675
+    exists:
+      - '#main-content-video_detail'
+      - '#main-content-video_detail [data-e2e="recommend-list-item-container"][data-scroll-index="0"]'
+      - '[data-e2e="nav-foryou"]'
+      - '[data-e2e="nav-explore"]'
+      - '[data-e2e="nav-live"]'
+      - '[data-e2e="nav-following"]'
+  - name: For You page root
+    url: https://www.tiktok.com/foryou
+    exists: ['#main-content-homepage_hot', '[data-e2e="feed-navigation-next"]']
+  - name: Explore page root
+    url: https://www.tiktok.com/explore
+    exists: ['#main-content-explore_page']
+  - name: profile suggested accounts toggle
+    url: https://www.tiktok.com/@tiktok
+    exists: ['[data-e2e="user-page"]', '[data-testid="tux-web-button-container"] > [data-e2e="show-suggested-accounts"]']
+  - name: For You redirects to Following
+    url: https://www.tiktok.com/
+    expectUrl: https://www.tiktok.com/following

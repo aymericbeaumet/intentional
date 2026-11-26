@@ -1,0 +1,38 @@
+! Reddit: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- r/popular, r/all, Explore, News: their feeds ---
+! Redirects send these pages to Home; this is the fallback without redirects.
+! The logged-out front page is r/popular too (pagetype="popular").
+www.reddit.com##shreddit-app[pagetype="popular"] #main-content
+www.reddit.com##shreddit-app[pagetype="all"] #main-content
+www.reddit.com##shreddit-app[pagetype="explore"] #main-content
+www.reddit.com##shreddit-app[pagetype="news"] #main-content
+
+! --- Entry points to those feeds ---
+! The left menu draws Popular and Explore in its shadow root, switched on by these attributes.
+www.reddit.com##+js(remove-attr, popular|explore|news, left-nav-top-section, asap stay)
+! Sidebar and footer links.
+www.reddit.com##faceplate-tracker:is([noun="popular_menu"], [noun="explore_menu"], [noun="news_menu"])
+! Old Reddit's top bar.
+old.reddit.com##.sr-bar > li:has(> a[href$="/r/popular/"])
+old.reddit.com##.sr-bar > li:has(> a[href$="/r/all/"])
+
+! --- Feeds: posts Reddit recommends instead of what you joined ---
+! Recommended posts name why they were picked in recommendation-source.
+www.reddit.com##shreddit-feed > article:has(> shreddit-post[recommendation-source]:not([recommendation-source=""]))
+! In Home, a Join button means the post comes from a community you haven't joined.
+www.reddit.com##shreddit-feed[reload-url*="home-feed"] > article:has(shreddit-join-button)
+
+! --- Suggested communities ---
+www.reddit.com##in-feed-community-recommendations
+www.reddit.com##aside.right-rail-popular-communities
+
+! --- Next to a post: related posts, "People also ask about", video end screens ---
+www.reddit.com##aside:has(> pdp-right-rail)
+www.reddit.com###answers-suggested-queries-pdp
+www.reddit.com##shreddit-player [slot="recommendation-overlay"]
+
+! --- Search box: trending searches and trending communities ---
+! They render in the search box's shadow root, so block the request that loads them:
+! the typeahead with an empty query. Typing still gets suggestions.
+||www.reddit.com/svc/shreddit/search-typeahead?query=&$xhr,1p

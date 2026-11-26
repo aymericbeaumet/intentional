@@ -1,0 +1,10 @@
+node_modules/
+/dist/
+.cache/
+.auth/
+coverage/
+test-results/
+*.log
+.DS_Store
+.idea/
+.vscode/

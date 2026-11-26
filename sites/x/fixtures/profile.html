@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Someone / X</title></head>
+<body>
+<div id="react-root">
+  <main role="main">
+    <div data-testid="primaryColumn">
+      <div>
+        <div id="profile-header"><div data-testid="UserName">Someone</div><button>Following</button></div>
+        <div><aside role="complementary" aria-label="Who to follow" id="profile-wtf">
+          <h2 role="heading"><div dir="ltr"><span>You might like</span></div></h2>
+          <div data-testid="UserCell"><a href="/stranger">Stranger</a></div>
+          <a href="/i/connect_people?user_id=1" role="link">Show more</a>
+        </aside></div>
+        <nav role="navigation">
+          <div role="tablist" data-testid="ScrollSnap-List">
+            <div role="presentation"><a href="/someone" role="tab" aria-selected="true" id="profile-tab-posts">Posts</a></div>
+            <div role="presentation"><a href="/someone/with_replies" role="tab" aria-selected="false" id="profile-tab-replies">Replies</a></div>
+          </div>
+        </nav>
+        <section role="region" id="profile-timeline">
+          <h1 role="heading">Someone's posts</h1>
+          <div aria-label="Timeline: Someone's posts"><div>
+            <div data-testid="cellInnerDiv" id="profile-tweet"><article data-testid="tweet"><a href="/someone/status/8888888888888888888">A post by someone</a></article></div>
+          </div></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</body></html>

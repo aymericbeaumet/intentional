@@ -1,0 +1,38 @@
+! TikTok: see site.yaml for the policy and tests.yaml for what each rule must do.
+
+! --- For You and Explore feeds (both redirect to Following) ---
+! TikTok names each page's root `main-content-<page>`, before and after in-app navigation.
+www.tiktok.com###main-content-homepage_hot
+www.tiktok.com###main-content-explore_page
+||tiktok.com/api/recommend/item_list$xhr,1p
+||tiktok.com/api/prefetch/recommend/item_list$xhr,1p
+||tiktok.com/api/explore/item_list$xhr,1p
+||tiktok.com/api/prefetch/explore/item_list$xhr,1p
+
+! --- Side navigation: entries that only lead to algorithmic feeds ---
+www.tiktok.com##a[data-e2e="nav-foryou"]
+www.tiktok.com##a[data-e2e="nav-explore"]
+www.tiktok.com##a[data-e2e="nav-live"]
+www.tiktok.com##a[data-e2e="nav-short-drama"]
+
+! --- A video opened by URL: the video and its comments, no queue of next videos ---
+! The related list feeds the videos stacked under the opened one; the opened video is server-rendered.
+||tiktok.com/api/related/item_list$xhr,1p
+www.tiktok.com###main-content-video_detail [data-e2e="recommend-list-item-container"]:not([data-scroll-index="0"])
+www.tiktok.com###main-content-video_detail [data-e2e="feed-navigation-prev"]
+www.tiktok.com###main-content-video_detail [data-e2e="feed-navigation-next"]
+www.tiktok.com###main-content-video_detail [data-testid="tux-web-tab-bar-container"]:has-text(/^\s*You may like\s*$/)
+
+! --- Suggested accounts (Following page, profiles) ---
+www.tiktok.com###main-content-homepage_follow [data-e2e="recommend-card"]
+www.tiktok.com##[data-testid="tux-web-button-container"]:has(> [data-e2e="show-suggested-accounts"])
+www.tiktok.com##[data-e2e="user-page"] div:has(> div > div > [aria-label="View All"])
+
+! --- LIVE: the For You LIVE feed and its entry points (the hub redirects to Following LIVE) ---
+www.tiktok.com##a[data-e2e="nav-discover-live"]
+www.tiktok.com##a[data-e2e="discover-nav-category-tab"][href="/live"]
+www.tiktok.com##:matches-path(/^\/live\/?(\?|$)/) [data-e2e="discover-list-live-card"]
+www.tiktok.com##:matches-path(/^\/live\/?(\?|$)/) [data-e2e="discover_category-list-live-card"]
+
+! --- Short dramas hub (redirects to Following) ---
+www.tiktok.com##[data-e2e="short-drama-library-page"]

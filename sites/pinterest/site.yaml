@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: pinterest
+name: Pinterest
+domains: [pinterest.com]
+# Country domains (pinterest.fr, pinterest.co.uk, ...) redirect to these country subdomains.
+hosts:
+  - www.pinterest.com
+  - ar.pinterest.com
+  - at.pinterest.com
+  - au.pinterest.com
+  - br.pinterest.com
+  - ca.pinterest.com
+  - ch.pinterest.com
+  - cl.pinterest.com
+  - co.pinterest.com
+  - cz.pinterest.com
+  - de.pinterest.com
+  - dk.pinterest.com
+  - es.pinterest.com
+  - fi.pinterest.com
+  - fr.pinterest.com
+  - gr.pinterest.com
+  - hu.pinterest.com
+  - id.pinterest.com
+  - ie.pinterest.com
+  - in.pinterest.com
+  - it.pinterest.com
+  - jp.pinterest.com
+  - kr.pinterest.com
+  - mx.pinterest.com
+  - nl.pinterest.com
+  - no.pinterest.com
+  - nz.pinterest.com
+  - ph.pinterest.com
+  - pl.pinterest.com
+  - pt.pinterest.com
+  - ro.pinterest.com
+  - ru.pinterest.com
+  - se.pinterest.com
+  - sk.pinterest.com
+  - tr.pinterest.com
+  - uk.pinterest.com
+  - za.pinterest.com
+
+intentional:
+  - label: Following
+    url: https://www.pinterest.com/following/
+
+policy:
+  allowed:
+    - A single pin opened by URL (pin.it short links lead there), with its comments and the board it was saved to
+    - The Following feed (pins from people and boards you follow, newest first)
+    - Boards, profiles and your own boards
+    - Search, and a topic page (/ideas/<topic>/<id>/) opened by URL
+    - Your notifications, messages and settings
+  blocked:
+    - The home feed (hidden; see limitations)
+    - Explore and Today (redirect to Following)
+    - The "More to explore" pins under a pin opened by URL, its "More like this" button and its related interests
+    - The Explore and Shopping entries of the navigation
+  limitations:
+    - The home page can't be redirected to Following. Pinterest sends logged-out visitors from /following/ back to the home page, so a redirect would loop. The home feed is hidden instead; bookmark pinterest.com/following/ as your start page.
+    - A board's "More ideas" tab (recommendations for that board) isn't hidden yet; its markup couldn't be checked without an account.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), Explore and Today stay reachable but their feeds are hidden.
+    - The Following feed and the logged-in home page couldn't be checked first-hand (no account); their rules follow Pinterest's own code and the logged-out pages.
+
+redirects:
+  - from: '^/ideas/?(\?.*)?$'
+    to: /following/
+  - from: '^/today/?(\?.*)?$'
+    to: /following/

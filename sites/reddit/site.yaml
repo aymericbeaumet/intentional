@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: reddit
+name: Reddit
+domains: [reddit.com]
+# m., new. and sh.reddit.com redirect to www.reddit.com server-side.
+hosts: [www.reddit.com, old.reddit.com]
+
+intentional:
+  - label: Home (communities you joined)
+    url: https://www.reddit.com/
+
+policy:
+  allowed:
+    - Home feed of the communities you joined
+    - Communities (/r/<name>/), and posts with their comments opened by URL
+    - User profiles, custom feeds you built, saved posts
+    - Search (suggestions while you type stay)
+    - Inbox, chat, notifications and settings
+    - Old Reddit (old.reddit.com), front page included
+  blocked:
+    - r/popular, r/all, Explore and News (redirect to Home)
+    - Posts from communities you haven't joined, injected into Home ("Suggested for you", "Because you visited…", "Popular near you")
+    - Recommended posts injected into community feeds
+    - '"Suggested communities" blocks in feeds and the "Popular Communities" sidebar'
+    - '"Related posts" ("More posts you may like") and "People also ask about" next to a post'
+    - Video recommendations shown when a video ends
+    - Trending searches and trending communities in the search box
+    - The Popular and Explore entries of the left menu and sidebar links; Popular and All in old Reddit's top bar
+  limitations:
+    - >-
+      Reddit's "For You" home (tested since June 2026, rolled out from late October 2026) mixes
+      recommendations into the home feed at the same URL. The list hides the posts from communities
+      you haven't joined, but Reddit still loads them, so For You can look short. Turn off "Show
+      recommendations in home feed" in Reddit's settings if your account has it, and pick the
+      Following tab when Reddit shows one.
+    - >-
+      old.reddit.com's front page is the strictest view: only the communities you subscribed to,
+      paginated, no recommendations. Reddit now asks you to log in before showing it.
+    - >-
+      Trending searches are drawn inside the search box's shadow DOM, where element hiding can't
+      reach. The list blocks the request that loads them instead (the one with an empty query), so
+      the search box stays empty until you type.
+    - >-
+      The left menu's News entry can't be hidden reliably (Reddit draws it in a shadow root
+      without a switch); News redirects to Home.
+    - >-
+      Without redirects (Brave, uBO Lite, AdGuard without Trusted), r/popular, Explore and News stay
+      reachable but their feeds are hidden. AdGuard also needs Trusted to hide the left menu's
+      Popular and Explore entries.
+
+redirects:
+  - from: '^/r/([Pp]opular|[Aa]ll)(/|\?|$)'
+    to: /
+    hosts: [www.reddit.com]
+  - from: '^/(explore|news)(/|\?|$)'
+    to: /
+    hosts: [www.reddit.com]

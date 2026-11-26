@@ -1,0 +1,162 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.facebook\.com/\?(.*&)?sk=h_chr', file: feeds.html }
+  - { url: '^https://www\.facebook\.com/(home\.php)?(\?.*)?$', file: home.html }
+  - { url: '^https://www\.facebook\.com/watch/?\?(.*&)?v=', file: video.html }
+  - { url: '^https://www\.facebook\.com/[\w.]+/videos/', file: video.html }
+  - { url: '^https://www\.facebook\.com/watch', file: watch.html }
+  - { url: '^https://www\.facebook\.com/reel/', file: reel.html }
+  - { url: '^https://www\.facebook\.com/gaming', file: gaming.html }
+
+redirects:
+  # Home: everything but Feeds (sk=h_chr, any filter) goes to Feeds.
+  - { url: 'https://www.facebook.com/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/?ref=logo', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/?sk=h_nor', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/?sk=h_chrx', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/home.php', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/?filter=all&sk=h_chr', expect: null }
+  - { url: 'https://www.facebook.com/?filter=friends&sk=h_chr', expect: null }
+  - { url: 'https://www.facebook.com/?filter=groups&sk=h_chr', expect: null }
+  - { url: 'https://www.facebook.com/?sk=h_chr', expect: null }
+  - { url: 'https://www.facebook.com/?sk=h_chr&filter=favorites', expect: null }
+  - { url: 'https://www.facebook.com/home.php?sk=h_chr', expect: null }
+  # Video (Watch): home and its tabs go to Feeds, a video opened by URL plays.
+  - { url: 'https://www.facebook.com/watch/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/?ref=tab', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/?ref=tab&nav=1', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/live/?ref=watch', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/shows/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/topic/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/watch/?v=1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/watch?v=1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/watch/?ref=saved&v=1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/watch/live/?ref=watch_permalink&v=1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/watch/saved/', expect: null }
+  - { url: 'https://www.facebook.com/watch/100080376596424/', expect: null }
+  - { url: 'https://www.facebook.com/Meta/videos/1670082768131967/', expect: null }
+  - { url: 'https://www.facebook.com/video.php?v=1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/share/v/1AbCdEfGhI/', expect: null }
+  # Reels: the tab goes to Feeds, a reel opened by URL plays.
+  - { url: 'https://www.facebook.com/reel/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/reel/?s=bookmark', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/reels/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/reel/1670082768131967', expect: null }
+  - { url: 'https://www.facebook.com/reel/1670082768131967/?s=fb_shorts_profile&stack_idx=0', expect: null }
+  - { url: 'https://www.facebook.com/share/r/1AbCdEfGhI/', expect: null }
+  - { url: 'https://www.facebook.com/Meta/reels/', expect: null }
+  # Gaming: home and its video feeds go to Feeds, a streamer's page stays.
+  - { url: 'https://www.facebook.com/gaming/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/?ref=games_tab', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/feed/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/video/', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/live/?s=SUGGESTED', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/browse/games/?language=ALL_LANG', expect: 'https://www.facebook.com/?filter=all&sk=h_chr' }
+  - { url: 'https://www.facebook.com/gaming/Naigman/', expect: null }
+  - { url: 'https://www.facebook.com/gaming/feedback/', expect: null }
+  # Other allowed pages.
+  - { url: 'https://www.facebook.com/marketplace/', expect: null }
+  - { url: 'https://www.facebook.com/groups/feed/', expect: null }
+  - { url: 'https://www.facebook.com/friends/', expect: null }
+  - { url: 'https://www.facebook.com/Meta/', expect: null }
+  - { url: 'https://www.facebook.com/Meta/posts/pfbid0abc', expect: null }
+  - { url: 'https://www.facebook.com/messages/t/1234567890/', expect: null }
+  - { url: 'https://www.facebook.com/search/top/?q=intentional', expect: null }
+
+pages:
+  - name: Feeds keeps posts from friends and groups, and drops suggestions, Reels carousels and entry points
+    url: https://www.facebook.com/?filter=all&sk=h_chr
+    visible:
+      - '#unit-friend'
+      - '#unit-group'
+      - '#unit-friend-reel'
+      - '#feeds-tabs'
+      - '#left-feeds'
+      - '#left-marketplace'
+      - '#top-home'
+      - '#top-marketplace'
+      - '#top-groups'
+    hidden: ['#unit-reels', '#unit-suggested', '#top-video', '#top-gaming', '#left-video', '#left-reels', '#left-gaming']
+  - name: the Friends feed keeps its posts
+    url: https://www.facebook.com/?filter=friends&sk=h_chr
+    visible: ['#unit-friend', '#tab-friends']
+    hidden: ['#unit-suggested']
+  - name: the home feed is hidden, stories, the composer and navigation stay
+    url: https://www.facebook.com/
+    hidden:
+      - '#unit-friend'
+      - '#unit-pymk'
+      - '#unit-reels'
+      - '#unit-suggested'
+      - '#unit-suggested-groups'
+      - '#top-video'
+      - '#top-gaming'
+      - '#left-reels'
+      - '#left-video'
+      - '#left-gaming'
+    visible: ['#stories', '#composer', '#top-home', '#top-friends', '#left-feeds', '#left-friends', '#left-groups', '#left-saved']
+  - name: home redirects to Feeds
+    url: https://www.facebook.com/
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+    visible: ['#unit-friend', '#feeds-tabs']
+  - name: a video opened by URL plays with its comments, without related reels or Video tabs
+    url: https://www.facebook.com/watch/?v=1670082768131967
+    visible: ['#video', '#video-meta', '#video-comments', '#video-search', '#vnav-saved', '#video-page-channel', '#live-permalink', '#video-permalink', '#top-home']
+    hidden: ['#related-reels', '#vnav-home', '#vnav-live', '#vnav-reels', '#vnav-shows', '#vnav-explore', '#top-video']
+  - name: a Page video opened by URL plays
+    url: https://www.facebook.com/Meta/videos/1670082768131967/
+    visible: ['#video', '#video-comments']
+    hidden: ['#related-reels']
+  - name: Video home loses its tabs and keeps its search
+    url: https://www.facebook.com/watch/
+    visible: ['#video-search', '#vnav-saved']
+    hidden: ['#vnav-home', '#vnav-live', '#vnav-reels', '#vnav-shows', '#vnav-explore']
+  - name: Video home redirects to Feeds
+    url: https://www.facebook.com/watch/
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+  - name: a reel opened by URL plays without previous/next buttons
+    url: https://www.facebook.com/reel/1670082768131967
+    visible: ['#reel-video', '#reel-author', '#reel-actions', '#reel-close']
+    hidden: ['#reel-prev', '#reel-next', '#reels-tab-link']
+  - name: the Reels tab redirects to Feeds
+    url: https://www.facebook.com/reel/?s=bookmark
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+  - name: Gaming home loses its video feed buttons and keeps streamer pages
+    url: https://www.facebook.com/gaming/
+    visible: ['#gaming-streamer', '#gnav-streamer']
+    hidden: ['#gnav-video', '#gnav-feed']
+  - name: Gaming redirects to Feeds
+    url: https://www.facebook.com/gaming/
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+  - name: in-app navigation to home lands on Feeds
+    url: https://www.facebook.com/watch/?v=1670082768131967
+    steps: [{ navigate: / }]
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+    visible: ['#unit-friend']
+  - name: in-app navigation to the Reels tab lands on Feeds
+    url: https://www.facebook.com/reel/1670082768131967
+    steps: [{ navigate: /reel/?s=tab }]
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr
+
+live:
+  - name: reel player structure our rules rely on
+    url: https://www.facebook.com/reel/1670082768131967
+    exists: ['div[role="main"] [data-pagelet="Reels"]', 'div:has(> div [data-pagelet="Reels"]) > div[role="button"]', 'a[href="/reel/"]']
+    hidden: ['div:has(> div [data-pagelet="Reels"]) > div[role="button"]', 'a[href="/reel/"]']
+  - name: video page structure our rules rely on
+    url: https://www.facebook.com/Meta/videos/1670082768131967/
+    exists:
+      - 'div[role="main"]'
+      - 'div[role="region"] div[data-type="hscroll-child"] a[href*="/reel/"]'
+      - 'a[href="/watch/"]'
+      - 'a[href^="/watch/live/"]'
+      - 'a[href^="/reel/?"]'
+    hidden:
+      - 'div:has(> div > div[role="region"] div[data-type="hscroll-child"] a[href*="/reel/"])'
+      - 'a[href="/watch/"]'
+      - 'a[href^="/reel/?"]'
+  - name: Video home redirects to Feeds
+    url: https://www.facebook.com/watch/
+    expectUrl: https://www.facebook.com/?filter=all&sk=h_chr

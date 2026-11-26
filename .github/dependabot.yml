@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      adguard:
+        patterns: ["@adguard/*"]
+      tooling:
+        patterns: ["*"]
+        exclude-patterns: ["@adguard/*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../../src/schema/tests.schema.json
+fixtures:
+  - { url: '^https://www\.linkedin\.com/feed/?(\?.*)?$', file: feed.html }
+  - { url: '^https://www\.linkedin\.com/feed/update/', file: post.html }
+  - { url: '^https://www\.linkedin\.com/notifications/', file: notifications.html }
+  - { url: '^https://www\.linkedin\.com/mynetwork/(grow/?)?(\?.*)?$', file: mynetwork.html }
+  - { url: '^https://www\.linkedin\.com/mynetwork/network-manager/', file: followers.html }
+  - { url: '^https://www\.linkedin\.com/in/', file: profile.html }
+
+network:
+  - url: https://www.linkedin.com/flagship-web/rsc-action/actions/pagination?sduiid=com.linkedin.sdui.pagers.feed.mainFeed
+    from: https://www.linkedin.com/feed/
+    type: fetch
+    expect: block
+    why: the next page of the feed
+  - url: https://www.linkedin.com/flagship-web/rsc-action/actions/pagination?sduiid=com.linkedin.sdui.pagers.notifications.list
+    from: https://www.linkedin.com/notifications/
+    type: fetch
+    expect: allow
+    why: other paginated lists keep loading
+  - url: https://www.linkedin.com/feed/update/urn:li:activity:7000000000000000001/
+    type: document
+    expect: allow
+  - url: https://www.linkedin.com/notifications/
+    type: document
+    expect: allow
+
+redirects:
+  - { url: 'https://www.linkedin.com/feed/', expect: 'https://www.linkedin.com/notifications/' }
+  - { url: 'https://www.linkedin.com/feed', expect: 'https://www.linkedin.com/notifications/' }
+  - { url: 'https://www.linkedin.com/feed/?trk=nav_logo', expect: 'https://www.linkedin.com/notifications/' }
+  - url: 'https://www.linkedin.com/feed/?highlightedUpdateUrns=urn%3Ali%3Aactivity%3A7000000000000000001'
+    expect: 'https://www.linkedin.com/feed/update/urn%3Ali%3Aactivity%3A7000000000000000001/'
+  - url: 'https://www.linkedin.com/feed/?highlightedUpdateType=SHARED_BY_YOUR_NETWORK&highlightedUpdateUrns=urn%3Ali%3Aactivity%3A7000000000000000001%2Curn%3Ali%3Aactivity%3A7000000000000000002'
+    expect: 'https://www.linkedin.com/feed/update/urn%3Ali%3Aactivity%3A7000000000000000001/'
+  - url: 'https://www.linkedin.com/feed/?highlightedUpdateUrns=urn:li:share:7000000000000000003'
+    expect: 'https://www.linkedin.com/feed/update/urn:li:share:7000000000000000003/'
+  - url: 'https://www.linkedin.com/feed/?highlightedUpdateUrns=urn%3ali%3aactivity%3a7000000000000000001&trk=notification'
+    expect: 'https://www.linkedin.com/feed/update/urn%3ali%3aactivity%3a7000000000000000001/'
+  - url: 'https://www.linkedin.com/feed/?highlightedUpdateUrns=urn:li:share:7000000000000000001suffix'
+    expect: 'https://www.linkedin.com/notifications/'
+  - { url: 'https://www.linkedin.com/feed/update/urn:li:activity:7000000000000000001/', expect: null }
+  - { url: 'https://www.linkedin.com/feed/update/urn:li:activity:7000000000000000001/?utm_source=share', expect: null }
+  - { url: 'https://www.linkedin.com/feed/following/', expect: null }
+  - { url: 'https://www.linkedin.com/feed/hashtag/intentional/', expect: null }
+  - { url: 'https://www.linkedin.com/posts/someone_title-activity-7000000000000000001-abcd/', expect: null }
+  - { url: 'https://www.linkedin.com/notifications/', expect: null }
+  - { url: 'https://www.linkedin.com/mynetwork/grow/', expect: null }
+  - { url: 'https://www.linkedin.com/in/someone/', expect: null }
+  - { url: 'https://www.linkedin.com/messaging/', expect: null }
+  - { url: 'https://www.linkedin.com/search/results/all/?keywords=feed', expect: null }
+  - { url: 'https://www.linkedin.com/feedback/', expect: null }
+
+pages:
+  - name: the feed page is hidden
+    url: https://www.linkedin.com/feed/
+    hidden: ['#main', '#left-rail', '#right-rail', '#nav-home']
+    visible: ['#nav-network', '#nav-notifications']
+  - name: the feed redirects to notifications
+    url: https://www.linkedin.com/feed/
+    expectUrl: https://www.linkedin.com/notifications/
+    visible: ['#notifications-list']
+  - name: the feed page with a query is hidden
+    url: https://www.linkedin.com/feed/?trk=nav_logo
+    hidden: ['#main', '#right-rail']
+  - name: mentioning the highlight parameter in a tracking value keeps the feed hidden
+    url: https://www.linkedin.com/feed/?trk=highlightedUpdateUrns
+    hidden: ['#main', '#right-rail']
+  - name: a malformed highlighted post ID keeps the feed hidden
+    url: https://www.linkedin.com/feed/?highlightedUpdateUrns=urn:li:share:7000000000000000001suffix
+    hidden: ['#main', '#right-rail']
+  - name: a feed link highlighting a post keeps the post, drops the rail modules
+    url: https://www.linkedin.com/feed/?highlightedUpdateType=SHARED_BY_YOUR_NETWORK&highlightedUpdateUrns=urn%3ali%3aactivity%3a7000000000000000001
+    visible: ['#main', '#feed-post', '#right-rail', '#games-module']
+    hidden: ['#news-module', '#follows-module', '#feed-news-module', '#classic-follows-module', '#rail-ad', '#nav-home']
+  - name: a feed link highlighting a post opens that post
+    url: https://www.linkedin.com/feed/?highlightedUpdateUrns=urn%3ali%3aactivity%3a7000000000000000001,urn:li:share:7000000000000000002
+    expectUrl: https://www.linkedin.com/feed/update/urn%3ali%3aactivity%3a7000000000000000001/
+    visible: ['#single-post']
+  - name: a single post opened by URL stays, with its comments
+    url: https://www.linkedin.com/feed/update/urn:li:activity:7000000000000000001/
+    visible: ['#main', '#single-post', '#post-comments', '#post-left-rail', '#post-author', '#nav-notifications']
+    hidden: ['#rail-ad', '#nav-home']
+  - name: notifications stay
+    url: https://www.linkedin.com/notifications/
+    visible: ['#notifications-list', '#nav-notifications', '#footer']
+    hidden: ['#rail-ad', '#nav-home']
+  - name: My Network keeps invitations and drops suggestions
+    url: https://www.linkedin.com/mynetwork/grow/
+    visible: ['#invitations', '#invitation-card', '#manage-network']
+    hidden: ['#pymk-card', '#follow-card']
+  - name: your followers stay, with their Follow buttons
+    url: https://www.linkedin.com/mynetwork/network-manager/people-follow/followers/
+    visible: ['#follower-card', '#classic-nav-network', '#classic-nav-notifications']
+    hidden: ['#classic-nav-home', '#banner-ad']
+  - name: a profile keeps its card and drops "People you may know"
+    url: https://www.linkedin.com/in/someone/
+    visible: ['#profile-card', '#rail-sections', '#profile-language']
+    hidden: ['#profile-pymk', '#profile-more']
+  - name: in-app navigation to the feed lands on notifications
+    url: https://www.linkedin.com/feed/update/urn:li:activity:7000000000000000001/
+    steps: [{ navigate: /feed/ }]
+    expectUrl: https://www.linkedin.com/notifications/
+
+live:
+  - name: the feed redirects to notifications (logged in)
+    url: https://www.linkedin.com/feed/
+    login: true
+    exists: ['main', 'aside', '[data-testid="primary-nav"] li button[aria-label^="Home"]']
+    expectUrl: https://www.linkedin.com/notifications/
+  - name: My Network suggestion cards (logged in)
+    url: https://www.linkedin.com/mynetwork/grow/
+    login: true
+    exists: ['button[aria-label^="Invite "][aria-label$=" to connect"]']
+    hidden: ['button[aria-label^="Invite "][aria-label$=" to connect"]']

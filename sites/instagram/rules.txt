@@ -1,0 +1,24 @@
+! Instagram: see site.yaml for the policy and tests.yaml for what each rule must do.
+! Class names are generated and change constantly: rules anchor on href, role and structure.
+
+! --- Entry points: Explore and the Reels feed (a profile's own Reels tab stays) ---
+www.instagram.com##a[href="/explore/"]
+www.instagram.com##a[href="/reels/"]
+
+! --- "For you" home feed, when redirects are off ---
+! The path regex reads the query: /?variant=following and /?variant=favorites keep their posts.
+www.instagram.com##:matches-path(/^\/(?:\?(?!(?:.*&)?variant=(?:following|favorites)(?:&|$)).*)?$/) main article
+
+! --- Suggested posts and reels mixed into feeds (English labels) ---
+www.instagram.com##article:has(span:has-text(/^Suggested (?:for you|posts|reels|threads)$/))
+
+! --- Suggested accounts: sidebar and feed carousels ("See all" leads to /explore/people/), profiles ---
+www.instagram.com##div:has(> div > a[href^="/explore/people/"])
+www.instagram.com##div:has(> div > a[href$="/related_profiles/"])
+
+! --- Explore grid, when redirects are off (the search box above it stays) ---
+www.instagram.com##:matches-path(/^\/explore\/?(?:\?.*)?$/) main a:is([href*="/p/"],[href*="/reel/"])
+
+! --- Reels feed, when redirects are off: the opened reel plays, the next ones and the up/down buttons are gone ---
+www.instagram.com##main > div[role="toolbar"]
+www.instagram.com##main:has(> div[role="toolbar"]) > div:first-child > div:nth-child(n+2)

@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=../../src/schema/site.schema.json
+id: facebook
+name: Facebook
+domains: [facebook.com]
+hosts: [www.facebook.com]
+
+intentional:
+  - label: Feeds (friends, groups and Pages you follow, newest first)
+    url: https://www.facebook.com/?filter=all&sk=h_chr
+  - label: Friends (newest first)
+    url: https://www.facebook.com/?filter=friends&sk=h_chr
+
+policy:
+  allowed:
+    - A post, a video or a reel opened by URL, with its comments
+    - Feeds (All, Favorites, Friends, Groups, Pages), newest first
+    - Groups you joined, profiles and Pages
+    - Search, Marketplace, Messenger, notifications, Saved and your own profile
+    - Stories from people and Pages you follow
+  blocked:
+    - The algorithmic home feed (redirects to Feeds)
+    - Video home and its Live, Shows and Explore tabs (redirect to Feeds)
+    - The Reels tab (redirects to Feeds) and the previous/next buttons of the reel player
+    - Gaming home and its video feeds (redirect to Feeds)
+    - People you may know, suggested groups, suggested posts and Reels carousels in feeds
+    - Related reels under a video
+    - The Video, Reels and Gaming buttons
+  limitations:
+    - Suggested posts that carry no link to Friends or Groups discovery are recognised by their English "Suggested for you" label. In other languages they stay in the feed.
+    - The reel player still moves to the next reel when you scroll or press the arrow keys; only its previous/next buttons are hidden.
+    - The mobile site (m.facebook.com) isn't covered. Its markup is different, and Facebook reportedly sends Feeds links back to the algorithmic home there.
+    - Without redirects (Brave, uBO Lite, AdGuard without Trusted), the home page stays reachable but its posts are hidden; Video, Gaming and the Reels tab stay reachable by URL, without their buttons. AdGuard may only re-check the URL-based home rule when the page reloads, so reload after opening Feeds in the app.
+
+redirects:
+  - from: '^/(?:home\.php)?(?:\?(?!(?:.*&)?sk=h_chr(?:&|$)).*)?$'
+    to: /?filter=all&sk=h_chr
+  - from: '^/watch(?:/(?:live|shows|topic))?/?(?:\?(?!(?:.*&)?v=).*)?$'
+    to: /?filter=all&sk=h_chr
+  - from: '^/reels?/?(?:\?.*)?$'
+    to: /?filter=all&sk=h_chr
+  - from: '^/gaming(?:/?|/(?:feed|video|browse|live)(?:/.*)?)(?:\?.*)?$'
+    to: /?filter=all&sk=h_chr

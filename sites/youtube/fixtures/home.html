@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>YouTube</title></head>
+<body>
+<ytd-app>
+  <ytd-masthead id="masthead"><ytd-topbar-logo-renderer id="logo"><a href="/">YouTube</a></ytd-topbar-logo-renderer></ytd-masthead>
+  <ytd-guide-renderer id="guide">
+    <ytd-guide-section-renderer>
+      <ytd-guide-entry-renderer id="guide-home"><a id="endpoint" href="/" title="Home">Home</a></ytd-guide-entry-renderer>
+      <ytd-guide-entry-renderer id="guide-shorts"><a id="endpoint" title="Shorts">Shorts</a></ytd-guide-entry-renderer>
+      <ytd-guide-entry-renderer id="guide-subscriptions"><a id="endpoint" href="/feed/subscriptions" title="Subscriptions">Subscriptions</a></ytd-guide-entry-renderer>
+    </ytd-guide-section-renderer>
+  </ytd-guide-renderer>
+  <ytd-mini-guide-renderer>
+    <ytd-mini-guide-entry-renderer id="mini-home" aria-label="Home"><a href="/" title="Home">Home</a></ytd-mini-guide-entry-renderer>
+    <ytd-mini-guide-entry-renderer id="mini-shorts" aria-label="Shorts"><a title="Shorts">Shorts</a></ytd-mini-guide-entry-renderer>
+    <ytd-mini-guide-entry-renderer id="mini-subscriptions" aria-label="Subscriptions"><a href="/feed/subscriptions" title="Subscriptions">Subscriptions</a></ytd-mini-guide-entry-renderer>
+  </ytd-mini-guide-renderer>
+  <ytd-page-manager id="page-manager">
+    <ytd-browse id="browse-home" page-subtype="home">
+      <ytd-rich-grid-renderer>
+        <ytd-rich-item-renderer><a href="/watch?v=AAAAAAAAAAA">Recommended video</a></ytd-rich-item-renderer>
+        <ytd-rich-section-renderer><ytd-rich-shelf-renderer is-shorts><a href="/shorts/BBBBBBBBBBB">Short</a></ytd-rich-shelf-renderer></ytd-rich-section-renderer>
+      </ytd-rich-grid-renderer>
+    </ytd-browse>
+  </ytd-page-manager>
+</ytd-app>
+</body></html>

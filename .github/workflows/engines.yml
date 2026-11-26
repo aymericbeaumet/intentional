@@ -1,0 +1,54 @@
+name: engines
+
+# Weekly: test against the latest uBlock Origin release and AdGuard engines.
+# Green → pull request bumping the pins. Red → issue.
+on:
+  schedule:
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  latest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: jdx/mise-action@v3
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
+      - name: Move pins to the latest releases
+        run: |
+          node src/cli.ts bump-ublock
+          npm install --save-exact @adguard/agtree@latest @adguard/aglint@latest @adguard/tsurlfilter@latest @adguard/extended-css@latest @adguard/scriptlets@latest @gorhill/ubo-core@latest
+      - uses: ./.github/actions/browsers
+      - id: check
+        run: make check
+        continue-on-error: true
+      - name: Propose the bump
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git diff --quiet && exit 0
+          branch="ab/engines-$(date +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "chore(engines): test against the latest uBlock Origin and AdGuard engines"
+          git push origin "$branch"
+          gh pr create --fill --head "$branch"
+      - name: Report the breakage
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create --title "Latest blocker engines break the lists" \
+            --body "The weekly engines run failed against the latest uBlock Origin / AdGuard releases: $RUN_URL"
+          exit 1
