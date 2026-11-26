@@ -62,7 +62,7 @@ jobs:
         env:
           INTENTIONAL_VERSION: ${{ needs.version.outputs.version }}
         run: npm run build && npm run site
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - name: Collect release assets
